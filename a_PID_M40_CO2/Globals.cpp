@@ -7,7 +7,7 @@ const uint8_t c_BUTTON_S_PIN = 19;
 const uint8_t c_BUTTON_RIGHT_PIN = 14;
 const uint8_t c_BUTTON_ON_PIN = 12;
 
-const uint8_t c_BUTTON_SINGLE_CLICK_HOLD_DURATION = 240;
+const uint8_t c_BUTTON_SINGLE_CLICK_HOLD_DURATION = 150;
 const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION = 3000;
 
 const char* c_FLASH_LOG_FREQ_PARAM_NAME = "flashLogFreq";
