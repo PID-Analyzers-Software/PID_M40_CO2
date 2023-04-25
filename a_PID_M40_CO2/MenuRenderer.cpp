@@ -7,6 +7,7 @@
 #include "SSD1306.h"
 #include <Arduino.h>
 #include <U8g2lib.h>
+#include "BluetoothSerial.h"
 
 SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display)
 
@@ -28,7 +29,8 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager) : SSD1306MenuRenderer(display),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, BluetoothSerial* SerialBT, DataSource* dataSource, GasManager* gasManager) : SSD1306MenuRenderer(display),
+  m_serialbt(SerialBT),
   m_dataSource(dataSource),
   m_gasManager(gasManager)
 {
@@ -62,20 +64,28 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
 
-  m_display->drawString(110, 0, String("90%").c_str());
+  m_display->drawString(105, 0, String("90%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
-  m_display->drawString(64, 0, "CO2");
+  //m_display->drawString(64, 0, "CO2");
+  m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(60, 18, "575.3");
+  if (m_dataSource->getDoubleValue() > 10001) {
+    m_display->drawString(60, 18, "xxx");
+  } else {
+    m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 0).c_str());
+
+  }
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(105, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
-  m_display->drawString(60, 51, "  Log                     Alm");   //Unit
+  m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_serialbt->print(String(timeString));
+  m_serialbt->print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
 
-  //  Serial.print(String(timeString));
-  //  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
+//  Serial.print(String(timeString));
+//  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
 
   m_display->display();
   delay(100);
