@@ -12,6 +12,7 @@ class DataLogger;
 class DataSource;
 class TimeSync;
 class Range;
+class Alarm;
 
 
 class MenuRenderer
@@ -51,10 +52,11 @@ class SSD1306RunMenuRenderer : public SSD1306MenuRenderer
 {
 	DataSource* 		m_dataSource;
 	GasManager*			m_gasManager;
+    Range*              m_range;
 	
 public:
 
-	SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager);
+	SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range);
 
 	void render(Menu* menu);
 };
@@ -81,6 +83,16 @@ public:
     void render(Menu* menu);
 };
 
+class SSD1306AlarmMenuRenderer : public SSD1306MenuRenderer
+{
+    Alarm* m_alarm;
+
+public:
+
+    SSD1306AlarmMenuRenderer(SSD1306Wire* display, Alarm* alarm);
+
+    void render(Menu* menu);
+};
 
 
 class SSD1306FlashLoggerMenuRenderer : public SSD1306MenuRenderer

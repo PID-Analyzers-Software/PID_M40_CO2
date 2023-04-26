@@ -6,7 +6,7 @@ class AnalogSourceInput
 {
 protected:
 
-    int 			m_refreshRate = 1; //refreshes per second
+    int 			m_refreshRate = 2; //refreshes per second
     int             m_numReadings  = 1;
     int             m_readings[1];
     int             m_readIndex  = 0;

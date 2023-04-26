@@ -249,6 +249,15 @@ void ConfigurationManager::saveTimerIntervalToEEPROM(int interval, bool doCommit
 
  }
 
+
+ void ConfigurationManager::saveAlarmToEEPROM(int alarm, bool doCommit)
+ {
+
+     Serial.println("EEPROM saveAlarmToEEPROM: " + String(alarm));
+     EEPROM.writeDouble(76, alarm);
+     EEPROM.commit();
+
+ }
 // void ConfigurationManager::saveGasSelectedToEEPROM(int gasIndex, bool doCommit)
 // {
 //     if(m_loadAllInProgress)

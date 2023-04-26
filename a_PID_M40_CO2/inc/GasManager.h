@@ -161,18 +161,18 @@ public:
 
     void calibrate2(double cal){
             m_calgas = cal / 1000;
-            m_secondp = (m_calgas - m_zero) / 7.5;
+            m_secondp = (m_calgas - m_zero) / 0.45;
             if(m_selectedGas==0) {
-                m_secondp = (m_calgas - m_zero) / 7.5;
+                m_secondp = (m_calgas - m_zero) / 0.45;
                 EEPROM.writeDouble(20+m_selectedGas*16, m_secondp);
             }else if(m_selectedGas ==1){
-                m_secondp2 = (m_calgas - m_zero) / 7.5;
+                m_secondp2 = (m_calgas - m_zero) / 0.45;
                 EEPROM.writeDouble(20+m_selectedGas*16, m_secondp2);
             }else if(m_selectedGas ==2){
-                m_secondp3 = (m_calgas - m_zero) / 7.5;
+                m_secondp3 = (m_calgas - m_zero) / 0.45;
                 EEPROM.writeDouble(20+m_selectedGas*16, m_secondp3);
             }else if(m_selectedGas ==3){
-                m_secondp4 = (m_calgas - m_zero) / 7.5;
+                m_secondp4 = (m_calgas - m_zero) / 0.45;
                 EEPROM.writeDouble(20+m_selectedGas*16, m_secondp4);
             }
             EEPROM.commit();

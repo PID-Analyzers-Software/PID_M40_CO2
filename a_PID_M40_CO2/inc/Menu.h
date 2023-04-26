@@ -4,6 +4,7 @@
 #include "MenuRenderer.h"
 #include "SleepTimer.h"
 #include "RangeSet.h"
+#include "AlarmSet.h"
 #include "DataLogger.h"
 #include "TimeSync.h"
 #include "DataSource.h"
@@ -126,6 +127,29 @@ public:
     void action()
     {
         m_range->selectRangeByIndex(m_rangeIndex);
+    }
+
+};
+
+class AlarmMenuItem : public Menu
+{
+    Alarm* m_alarm  ;
+
+    int m_alarmIndex;
+
+public:
+
+    AlarmMenuItem(String name, String parentName, int alarmIndex, Alarm* alarm, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_alarm(alarm),
+              m_alarmIndex(alarmIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_alarm->selectAlarmByIndex(m_alarmIndex);
     }
 
 };

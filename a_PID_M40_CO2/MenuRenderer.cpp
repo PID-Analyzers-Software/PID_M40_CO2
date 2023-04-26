@@ -3,11 +3,12 @@
 #include "inc/SleepTimer.h"
 #include "inc/DataSource.h"
 #include "inc/RangeSet.h"
+#include "inc/AlarmSet.h"
+
 #include <Adafruit_ADS1015.h>
 #include "SSD1306.h"
 #include <Arduino.h>
 #include <U8g2lib.h>
-#include "BluetoothSerial.h"
 
 SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display)
 
@@ -21,7 +22,7 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Select Detector");
+  m_display->drawString(64, 0, "Select Gas");
   m_display->drawLine(10, 16, 256, 16);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
@@ -29,10 +30,10 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, BluetoothSerial* SerialBT, DataSource* dataSource, GasManager* gasManager) : SSD1306MenuRenderer(display),
-  m_serialbt(SerialBT),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
-  m_gasManager(gasManager)
+  m_gasManager(gasManager),
+  m_range(range)
 {
 
 }
@@ -42,8 +43,9 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, BluetoothSe
 void SSD1306RunMenuRenderer::render(Menu* menu)
 {
   const float multiplier = 0.125F; //GAIN 1
-
+  double range = m_range->getSelectedRange();
   Gas& selectedGas = m_gasManager->getSelectedGas();
+
   int64_t startMicros = esp_timer_get_time();
 
   m_display->clear();
@@ -53,7 +55,6 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   //date & time
   struct tm timeinfo;
   getLocalTime(&timeinfo, 10);
-
   int64_t passed = esp_timer_get_time() - startMicros;
   char dateString[30] = { 0 };
   char timeString[30] = { 0 };
@@ -67,11 +68,11 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(105, 0, String("90%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
-  //m_display->drawString(64, 0, "CO2");
-  m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
+  m_display->drawString(64, 0, "CO2");
+  //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
-  if (m_dataSource->getDoubleValue() > 10001) {
+  if (m_dataSource->getDoubleValue() > range) {
     m_display->drawString(60, 18, "xxx");
   } else {
     m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 0).c_str());
@@ -81,12 +82,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(105, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  m_serialbt->print(String(timeString));
-  m_serialbt->print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
 
-//  Serial.print(String(timeString));
-//  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
-
+  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
+  Serial.println(range);
   m_display->display();
   delay(100);
 
@@ -124,12 +122,30 @@ SSD1306RangeMenuRenderer::SSD1306RangeMenuRenderer(SSD1306Wire* display, Range* 
 void SSD1306RangeMenuRenderer::render(Menu* menu)
 {
   int range = m_range->getSelectedRange();
-
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Range");
-  m_display->drawLine(10, 24, 256, 24);
+  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawString(64, 30 , menu->getName());
+  m_display->display();
+}
+
+///////////////////////////////
+SSD1306AlarmMenuRenderer::SSD1306AlarmMenuRenderer(SSD1306Wire* display, Alarm* alarm) : SSD1306MenuRenderer(display),
+  m_alarm(alarm)
+{
+}
+
+void SSD1306AlarmMenuRenderer::render(Menu* menu)
+{
+  int alarm = m_alarm->getSelectedAlarm();
+
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->drawString(64, 0, "Alarm");
+  m_display->drawLine(10, 16, 256, 16);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
 }
@@ -313,7 +329,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(10, 16, 256, 16);
-  m_display->drawString(64, 22, "Cal Gas: 7500 ppm");
+  m_display->drawString(64, 22, "Cal Gas: 450 ppm");
   m_display->drawString(64, 32, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   m_display->drawString(64, 45, "<S>: Confirm");
 

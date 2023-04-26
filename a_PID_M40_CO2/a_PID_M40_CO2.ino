@@ -26,6 +26,7 @@
 #include "inc/WebServer.h"
 #include "inc/SleepTimer.h"
 #include "inc/RangeSet.h"
+#include "inc/AlarmSet.h"
 #include "inc/Globals.h"
 #include "inc/DataLogger.h"
 #include "inc/DataSource.h"
@@ -63,6 +64,7 @@ U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI display(U8G2_R0, /* clock=*/ 27, /* data=
 SleepTimer g_sleepTimer;
 
 Range g_range;
+Alarm g_alarm;
 
 DataLogger g_dataLogger;
 
@@ -124,9 +126,10 @@ void setup() {
   //display.setFont(ArialMT_Plain_16);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager,&g_range);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
+  MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
   MenuRenderer* wifiDumpMenuRenderer = new SSD1306WiFiDumpMenuRenderer(&display, &g_dataLogger);
@@ -189,11 +192,17 @@ void setup() {
 
   // Range Menus
     vector<Menu*> rangeMenus;
-    rangeMenus.push_back(new RangeMenuItem("1000", "Range",  0, &g_range, rangeMenuRenderer));
-    rangeMenus.push_back(new RangeMenuItem("5000", "Range",  1, &g_range, rangeMenuRenderer));
+    rangeMenus.push_back(new RangeMenuItem("500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+    rangeMenus.push_back(new RangeMenuItem("1000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
 
     CompositeMenu* rangeMenu = new CompositeMenu("Range","Main Menu" , rangeMenus);
 
+    // alarm Menus
+    vector<Menu*> alarmMenus;
+    alarmMenus.push_back(new AlarmMenuItem("300 ppm", "Alarm",  0, &g_alarm, alarmMenuRenderer));
+    alarmMenus.push_back(new AlarmMenuItem("500 ppm", "Alarm",  1, &g_alarm, alarmMenuRenderer));
+
+    CompositeMenu* alarmMenu = new CompositeMenu("Alarm","Main Menu" , alarmMenus);
 
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
@@ -229,10 +238,12 @@ void setup() {
   vector<Menu*> horizontalMenus;
 
   horizontalMenus.push_back(runMenu);
-  horizontalMenus.push_back(libraryMenu);
+  //horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
   horizontalMenus.push_back(rangeMenu);
-  //horizontalMenus.push_back(dataLoggerMenu);
+  horizontalMenus.push_back(alarmMenu);
+
+    //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
   horizontalMenus.push_back(calgasMenu);

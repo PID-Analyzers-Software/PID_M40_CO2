@@ -8,7 +8,7 @@
 
 class Range
 {
-    std::array<int,2> m_rangeArray{{1000,5000}};
+    std::array<int,2> m_rangeArray{{500,1000}};
     int m_selectedRange = 0;
 
     unsigned long m_startMillis = 0;
@@ -88,6 +88,6 @@ public:
         m_startMillis = millis();
     }
 
-    int getSelectedRange() { m_rangeArray[m_selectedRange]; }
+    int getSelectedRange() { return m_rangeArray[m_selectedRange]; }
 
 };
