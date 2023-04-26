@@ -84,7 +84,6 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
 
   Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
-  Serial.println(range);
   m_display->display();
   delay(100);
 
