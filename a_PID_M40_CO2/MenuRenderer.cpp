@@ -30,10 +30,11 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range) : SSD1306MenuRenderer(display),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range, Alarm* alarm) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
   m_gasManager(gasManager),
-  m_range(range)
+  m_range(range),
+  m_alarm(alarm)
 {
 
 }
@@ -43,10 +44,12 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource*
 void SSD1306RunMenuRenderer::render(Menu* menu)
 {
   const float multiplier = 0.125F; //GAIN 1
-  double range = m_range->getSelectedRange();
+  int range = m_range->getSelectedRange();
+  int alarm = m_alarm->getSelectedAlarm();
+  int64_t startMicros = esp_timer_get_time();
+
   Gas& selectedGas = m_gasManager->getSelectedGas();
 
-  int64_t startMicros = esp_timer_get_time();
 
   m_display->clear();
   m_display->setColor(WHITE);
@@ -82,7 +85,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(105, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  m_display->drawString(15, 51, "Alarm");
+  if (alarm != 0) {
+    m_display->drawString(15, 51, "Alm");
+  }
   m_display->drawString(117, 51, "Log");
 
   Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());

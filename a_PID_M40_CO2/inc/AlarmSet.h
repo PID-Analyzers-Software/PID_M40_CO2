@@ -88,6 +88,6 @@ public:
         m_startMillis = millis();
     }
 
-    int getSelectedAlarm() { m_alarmArray[m_selectedAlarm]; }
+    int getSelectedAlarm() { return m_alarmArray[m_selectedAlarm]; }
 
 };
