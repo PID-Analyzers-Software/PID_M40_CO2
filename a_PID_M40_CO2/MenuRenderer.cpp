@@ -68,7 +68,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
 
-  m_display->drawString(105, 0, String("90%").c_str());
+  m_display->drawString(110, 0, String("90%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawString(64, 0, "CO2");
@@ -86,7 +86,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   if (alarm != 0) {
-    m_display->drawString(15, 51, "Alm");
+    m_display->drawString(12, 51, "Alm");
   }
   m_display->drawString(117, 51, "Log");
 
