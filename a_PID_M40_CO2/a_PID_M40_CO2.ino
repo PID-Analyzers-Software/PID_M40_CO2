@@ -192,8 +192,8 @@ void setup() {
 
   // Range Menus
     vector<Menu*> rangeMenus;
-    rangeMenus.push_back(new RangeMenuItem("500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
-    rangeMenus.push_back(new RangeMenuItem("1000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+    rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+    rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
 
     CompositeMenu* rangeMenu = new CompositeMenu("Range","Main Menu" , rangeMenus);
 
