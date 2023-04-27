@@ -7,11 +7,6 @@ class AnalogSourceInput
 protected:
 
     int 			m_refreshRate = 2; //refreshes per second
-    int             m_numReadings  = 1;
-    int             m_readings[1];
-    int             m_readIndex  = 0;
-    long            m_total  = 0;
-
     unsigned long 	m_lastReadValueTick = -5000000;
     uint16_t 		m_lastReadValue;
     uint16_t 		m_lastReadValue_battery;
@@ -48,25 +43,16 @@ public:
 
         if(now - m_lastReadValueTick > 1000 / m_refreshRate)
         {
+            const int numReadings  = 5;
+            long total  = 0;
             m_lastReadValueTick = now;
-
-            m_total = m_total - m_readings[m_readIndex];
-            // read the sensor:
             const float multiplier = 0.125F; //GAIN 1
 
-            m_readings[m_readIndex] = m_ads1115->readADC_SingleEnded(0) * multiplier;
-            // add value to total:
-            m_total = m_total + m_readings[m_readIndex];
-            // handle index
-            m_readIndex = m_readIndex + 1;
-            if (m_readIndex >= m_numReadings) {
-                m_readIndex = 0;
+            for (int i = 0; i<numReadings; i++) {
+                total = total +m_ads1115->readADC_SingleEnded(0) * multiplier;
             }
-            delay(50);
-            // calculate the average:
-            m_lastReadValue = m_total / m_numReadings;
+            m_lastReadValue = total / numReadings;
         }
-
         return m_lastReadValue;
     }
 

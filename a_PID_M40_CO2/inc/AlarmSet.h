@@ -8,7 +8,7 @@
 
 class Alarm
 {
-    std::array<int,2> m_alarmArray{{300,500}};
+    std::array<int,3> m_alarmArray{{300,500,0}};
     int m_selectedAlarm = 0;
 
     unsigned long m_startMillis = 0;

@@ -201,6 +201,7 @@ void setup() {
     vector<Menu*> alarmMenus;
     alarmMenus.push_back(new AlarmMenuItem("300 ppm", "Alarm",  0, &g_alarm, alarmMenuRenderer));
     alarmMenus.push_back(new AlarmMenuItem("500 ppm", "Alarm",  1, &g_alarm, alarmMenuRenderer));
+    alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  2, &g_alarm, alarmMenuRenderer));
 
     CompositeMenu* alarmMenu = new CompositeMenu("Alarm","Main Menu" , alarmMenus);
 

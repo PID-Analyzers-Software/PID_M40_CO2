@@ -23,7 +23,7 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Select Gas");
-  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
 }
@@ -82,6 +82,8 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(105, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(15, 51, "Alarm");
+  m_display->drawString(117, 51, "Log");
 
   Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV\n").c_str());
   m_display->display();
@@ -106,7 +108,7 @@ void SSD1306SleepTimerMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "TIMER SLEEP");
-  m_display->drawLine(10, 24, 256, 24);
+  m_display->drawLine(0, 24, 256, 24);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
 }
@@ -125,7 +127,7 @@ void SSD1306RangeMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Range");
-  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
 }
@@ -144,7 +146,7 @@ void SSD1306AlarmMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Alarm");
-  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 30 , menu->getName());
   m_display->display();
 }
@@ -164,7 +166,7 @@ void SSD1306FlashLoggerMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "DATA LOGGER");
-  m_display->drawLine(10, 24, 256, 24);
+  m_display->drawLine(0, 24, 256, 24);
   m_display->drawString(64, 30 , menu->getName());
   m_display->drawString(64, 40 , m_dataLogger->isFlashStoreSessionRunning() ? "Started" : "Idle");
   m_display->display();
@@ -187,7 +189,7 @@ void SSD1306WiFiDumpMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "WIFI DATA DUMP");
-  m_display->drawLine(10, 24, 256, 24);
+  m_display->drawLine(0, 24, 256, 24);
   m_display->drawString(64, 30, menu->getName());
   m_display->drawString(64, 40, m_dataLogger->isWiFiDumpRunning() ? "Started" : "Idle");
   m_display->display();
