@@ -97,36 +97,36 @@ public:
 		unsigned long passedMillis = millis() - m_startMillis;
 		
 
-		if(passedMillis / 1000 >= 3000)
-		{
-
-            //add auto-off here
-            //digitalWrite(19, LOW);
-            //go in to deep sleep
-            gpio_hold_en(GPIO_NUM_5);
-            gpio_deep_sleep_hold_en();
-
-
-  for (int i = 0; i <= 3; i++) {
-    digitalWrite(25, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(200);                       // wait for a second
-    digitalWrite(25, LOW);    // turn the LED off by making the voltage LOW
-    delay(200);                       // wait for a second
-  }
-
-delay(1000);
-
-            Serial.println("SleepTimer deep_sleep!");
-            Serial.flush();
-
-			//m_u8g2->sleepOff();
-            Wire.beginTransmission(0x3C);
-            Wire.write(0x80);
-            Wire.write(SSD1306_DISPLAYOFF);
-            Wire.endTransmission(); //           m_display -> display();
-
-            delay(2000);
-            esp_deep_sleep_start();
+//		if(passedMillis / 1000 >= 3000)
+//		{
+//
+//            //add auto-off here
+//            //digitalWrite(19, LOW);
+//            //go in to deep sleep
+//            gpio_hold_en(GPIO_NUM_5);
+//            gpio_deep_sleep_hold_en();
+//
+//
+//  for (int i = 0; i <= 3; i++) {
+//    digitalWrite(25, HIGH);   // turn the LED on (HIGH is the voltage level)
+//    delay(200);                       // wait for a second
+//    digitalWrite(25, LOW);    // turn the LED off by making the voltage LOW
+//    delay(200);                       // wait for a second
+//  }
+//
+//delay(1000);
+//
+//            Serial.println("SleepTimer deep_sleep!");
+//            Serial.flush();
+//
+//			//m_u8g2->sleepOff();
+//            Wire.beginTransmission(0x3C);
+//            Wire.write(0x80);
+//            Wire.write(SSD1306_DISPLAYOFF);
+//            Wire.endTransmission(); //           m_display -> display();
+//
+//            delay(2000);
+//            esp_deep_sleep_start();
 		}			
 	}
 };
