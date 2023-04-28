@@ -1,15 +1,15 @@
 
 /*
- * Release Log
- * Save the selected gas index to the EEPROM memory. 3/4/2023
- * Range Selection Added but not implemented in the calculation. 2/28/2023
- * Bluetooth Datalogging added and implemented.
- */
+   Release Log
+   Save the selected gas index to the EEPROM memory. 3/4/2023
+   Range Selection Added but not implemented in the calculation. 2/28/2023
+   Bluetooth Datalogging added and implemented.
+*/
 
- /* Parts List:
-  * Huzzah32
-  * ADS1115
-  */
+/* Parts List:
+   Huzzah32
+   ADS1115
+*/
 
 #include <Adafruit_ADS1015.h>
 #include <SSD1306.h>
@@ -17,6 +17,7 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <vector>
+#include <DS3231M.h> // Include the DS3231M RTC library
 
 #include "inc/TimeSync.h"
 #include "inc/GasManager.h"
@@ -45,9 +46,10 @@ using namespace std;
 #define wifi_ssid "22CDPro"
 #define wifi_password "00525508"
 
-GasManager g_gasManager(1.73231201, -2.054456771, 1, 0, 0,0,0,0,0,0,0);
+GasManager g_gasManager(1.73231201, -2.054456771, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
 WebServer g_webServer;
+DS3231M_Class DS3231M;                         ///< Create an instance of the DS3231M class
 
 CompositeMenu* g_mainMenu = nullptr;
 
@@ -92,6 +94,7 @@ void IRAM_ATTR dummyTouchISR() {}
 void setup() {
   Serial.begin(115200);
   Serial.println("PID M30 v230304");
+  DS3231M.pinSquareWave(); // Make INT/SQW pin toggle at 1Hz
   // DEEP-SLEEP init
   pinMode(25, OUTPUT);
 
@@ -126,7 +129,7 @@ void setup() {
   //display.setFont(ArialMT_Plain_16);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager,&g_range, &g_alarm);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_range, &g_alarm);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
   MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
@@ -167,13 +170,13 @@ void setup() {
   // Gas Menus
   vector<Menu*> gasMenus;
 
-  
+
   gasMenus.push_back(new GasMenuItem("NH3", "LIBRARY",  0, &g_gasManager, gasMenuRenderer));
   gasMenus.push_back(new GasMenuItem("H2S", "LIBRARY", 1, &g_gasManager, gasMenuRenderer));
   gasMenus.push_back(new GasMenuItem("CO", "LIBRARY", 2, &g_gasManager, gasMenuRenderer));
   gasMenus.push_back(new GasMenuItem("O2", "LIBRARY",  3, &g_gasManager, gasMenuRenderer));
- // gasMenus.push_back(new GasMenuItem("DET 5", "LIBRARY", 4, &g_gasManager, gasMenuRenderer));
-//  gasMenus.push_back(new GasMenuItem("DET 6", "LIBRARY", 5, &g_gasManager, gasMenuRenderer));
+  // gasMenus.push_back(new GasMenuItem("DET 5", "LIBRARY", 4, &g_gasManager, gasMenuRenderer));
+  //  gasMenus.push_back(new GasMenuItem("DET 6", "LIBRARY", 5, &g_gasManager, gasMenuRenderer));
 
   CompositeMenu* libraryMenu = new CompositeMenu("LIBRARY", "Main Menu" , gasMenus);
 
@@ -191,19 +194,19 @@ void setup() {
 
 
   // Range Menus
-    vector<Menu*> rangeMenus;
-    rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  0, &g_range, rangeMenuRenderer));
-    rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+  vector<Menu*> rangeMenus;
+  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
 
-    CompositeMenu* rangeMenu = new CompositeMenu("Range","Main Menu" , rangeMenus);
+  CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
-    // alarm Menus
-    vector<Menu*> alarmMenus;
-    alarmMenus.push_back(new AlarmMenuItem("300 ppm", "Alarm",  0, &g_alarm, alarmMenuRenderer));
-    alarmMenus.push_back(new AlarmMenuItem("500 ppm", "Alarm",  1, &g_alarm, alarmMenuRenderer));
-    alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  2, &g_alarm, alarmMenuRenderer));
+  // alarm Menus
+  vector<Menu*> alarmMenus;
+  alarmMenus.push_back(new AlarmMenuItem("300 ppm", "Alarm",  0, &g_alarm, alarmMenuRenderer));
+  alarmMenus.push_back(new AlarmMenuItem("500 ppm", "Alarm",  1, &g_alarm, alarmMenuRenderer));
+  alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  2, &g_alarm, alarmMenuRenderer));
 
-    CompositeMenu* alarmMenu = new CompositeMenu("Alarm","Main Menu" , alarmMenus);
+  CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
 
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
@@ -244,7 +247,7 @@ void setup() {
   horizontalMenus.push_back(rangeMenu);
   horizontalMenus.push_back(alarmMenu);
 
-    //horizontalMenus.push_back(dataLoggerMenu);
+  //horizontalMenus.push_back(dataLoggerMenu);
   horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
   horizontalMenus.push_back(calgasMenu);
@@ -260,7 +263,7 @@ void setup() {
 
   g_webServer.init(&g_gasManager);
   //g_sleepTimer.init(&g_configurationManager);
-//  g_range.init(&g_configurationManager);
+  //  g_range.init(&g_configurationManager);
 
   g_dataLogger.init(dataSource, &g_gasManager);
 
@@ -338,6 +341,8 @@ void setupButtons()
 
 void loop()
 {
+  DS3231M.adjust(DateTime(2023, 4, 28, 23, 39, 00));
+
   ButtonPressDetector::handleTick();
 
   g_sleepTimer.handleTick();

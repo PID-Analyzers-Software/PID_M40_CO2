@@ -59,16 +59,16 @@ public:
     GasManager(double slope, double intercept, double secondp,
                double zero, double calgas, double intercept2,double secondp2,
                double intercept3,double secondp3,double intercept4,double secondp4) : m_slope(slope),
-                                                                 m_intercept(intercept),
-                                                                 m_secondp(secondp),
-                                                                 m_intercept2(intercept2),
-                                                                 m_secondp2(secondp2),
-                                                                 m_intercept3(intercept3),
-                                                                 m_secondp3(secondp3),
-                                                                 m_intercept4(intercept4),
-                                                                 m_secondp4(secondp4),
-                                                                 m_zero(zero),
-                                                                 m_calgas(calgas)
+                                                                                      m_intercept(intercept),
+                                                                                      m_secondp(secondp),
+                                                                                      m_intercept2(intercept2),
+                                                                                      m_secondp2(secondp2),
+                                                                                      m_intercept3(intercept3),
+                                                                                      m_secondp3(secondp3),
+                                                                                      m_intercept4(intercept4),
+                                                                                      m_secondp4(secondp4),
+                                                                                      m_zero(zero),
+                                                                                      m_calgas(calgas)
     {}
 
     ~GasManager() {}
@@ -126,7 +126,7 @@ public:
         if(index >= 0 && index < m_gases.size())
         {
             m_selectedGas = index;
-           //m_configurationManager->saveGasSelectedToEEPROM(index);
+            //m_configurationManager->saveGasSelectedToEEPROM(index);
             Serial.println("gas index saved"+index);
             EEPROM.writeInt(80, index);
             EEPROM.commit();
@@ -160,22 +160,22 @@ public:
     }
 
     void calibrate2(double cal){
-            m_calgas = cal / 1000;
+        m_calgas = cal / 1000;
+        m_secondp = (m_calgas - m_zero) / 0.45;
+        if(m_selectedGas==0) {
             m_secondp = (m_calgas - m_zero) / 0.45;
-            if(m_selectedGas==0) {
-                m_secondp = (m_calgas - m_zero) / 0.45;
-                EEPROM.writeDouble(20+m_selectedGas*16, m_secondp);
-            }else if(m_selectedGas ==1){
-                m_secondp2 = (m_calgas - m_zero) / 0.45;
-                EEPROM.writeDouble(20+m_selectedGas*16, m_secondp2);
-            }else if(m_selectedGas ==2){
-                m_secondp3 = (m_calgas - m_zero) / 0.45;
-                EEPROM.writeDouble(20+m_selectedGas*16, m_secondp3);
-            }else if(m_selectedGas ==3){
-                m_secondp4 = (m_calgas - m_zero) / 0.45;
-                EEPROM.writeDouble(20+m_selectedGas*16, m_secondp4);
-            }
-            EEPROM.commit();
+            EEPROM.writeDouble(20+m_selectedGas*16, m_secondp);
+        }else if(m_selectedGas ==1){
+            m_secondp2 = (m_calgas - m_zero) / 0.45;
+            EEPROM.writeDouble(20+m_selectedGas*16, m_secondp2);
+        }else if(m_selectedGas ==2){
+            m_secondp3 = (m_calgas - m_zero) / 0.45;
+            EEPROM.writeDouble(20+m_selectedGas*16, m_secondp3);
+        }else if(m_selectedGas ==3){
+            m_secondp4 = (m_calgas - m_zero) / 0.45;
+            EEPROM.writeDouble(20+m_selectedGas*16, m_secondp4);
+        }
+        EEPROM.commit();
     }
 
     void calibrate3(){
