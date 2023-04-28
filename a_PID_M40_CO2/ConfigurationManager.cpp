@@ -254,7 +254,7 @@ void ConfigurationManager::saveTimerIntervalToEEPROM(int interval, bool doCommit
  {
 
      Serial.println("EEPROM saveAlarmToEEPROM: " + String(alarm));
-     EEPROM.writeDouble(76, alarm);
+     EEPROM.writeDouble(196, alarm);
      EEPROM.commit();
 
  }

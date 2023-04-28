@@ -218,7 +218,7 @@ void setup() {
   // DateTime menu
   vector<Menu*> dateTimeMenus;
 
-  dateTimeMenus.push_back(new NTPSyncMenuItem("NTP Sync", "DATETIME", &g_timeSync, NTPSyncMenuRenderer));
+  dateTimeMenus.push_back(new NTPSyncMenuItem("Time Sync", "DATETIME", &g_timeSync, NTPSyncMenuRenderer));
   dateTimeMenus.push_back(new ShowTimeMenuItem("Current DateTime", "DATETIME", showTimeMenuRenderer));
 
   CompositeMenu* dateTimeMenu = new CompositeMenu("DATETIME", "Main Menu" , dateTimeMenus);
@@ -245,7 +245,7 @@ void setup() {
   horizontalMenus.push_back(alarmMenu);
 
     //horizontalMenus.push_back(dataLoggerMenu);
-  //horizontalMenus.push_back(dateTimeMenu);
+  horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
   horizontalMenus.push_back(calgasMenu);
 

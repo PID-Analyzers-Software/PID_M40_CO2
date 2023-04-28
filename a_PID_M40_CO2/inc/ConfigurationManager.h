@@ -49,7 +49,7 @@ class ConfigurationManager : public ParamChangeListener
     const uint8_t EEPROM_WIFI_SSID_OFFSET = 164;		//32 chars
     const uint8_t EEPROM_WIFI_PASSWORD_OFFSET = 196;	//32 chars
     const uint8_t EEPROM_RANGE_OFFSET = 36;	//uint16_t
-    const uint8_t EEPROM_Alarm_OFFSET = 76;	//uint16_t
+    const uint8_t EEPROM_Alarm_OFFSET = 196;	//uint16_t
 
 
     const uint8_t EEPROM_GAS_AIR_TC_OFFSET = 999;

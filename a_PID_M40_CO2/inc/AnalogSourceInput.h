@@ -8,6 +8,8 @@ protected:
 
     int 			m_refreshRate = 2; //refreshes per second
     unsigned long 	m_lastReadValueTick = -5000000;
+    int 			m_refreshRate_b = 1; //refreshes per second
+    unsigned long 	m_lastReadValueTick_b = -5000000;
     uint16_t 		m_lastReadValue;
     uint16_t 		m_lastReadValue_battery;
 
@@ -58,11 +60,15 @@ public:
 
     uint16_t getMiliVolts_battery()
     {
+        unsigned long now = millis();
 
-        const float multiplier = 0.125F; //GAIN 1
+        if(now - m_lastReadValueTick_b > 3000 / m_refreshRate_b) {
+            m_lastReadValueTick_b = now;
 
-        m_lastReadValue_battery = m_ads1115->readADC_SingleEnded(1) * multiplier;// / 1000.0;
+            const float multiplier = 0.125F; //GAIN 1
 
+            m_lastReadValue_battery = m_ads1115->readADC_SingleEnded(1) * multiplier;// / 1000.0;
+        }
         return m_lastReadValue_battery;
     }
 
