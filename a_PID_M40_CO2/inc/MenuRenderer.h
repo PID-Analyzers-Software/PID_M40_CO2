@@ -178,10 +178,11 @@ public:
 class SSD1306CalGasMenuRenderer : public SSD1306MenuRenderer
 {
     DataSource* 		m_dataSource;
+    Range*              m_range;
     GasManager*				m_gasManager;
 public:
 
-    SSD1306CalGasMenuRenderer(SSD1306Wire* display,  DataSource* dataSource, GasManager* gasManager);
+    SSD1306CalGasMenuRenderer(SSD1306Wire* display,  DataSource* dataSource,Range* range, GasManager* gasManager);
     void render(Menu* menu);
 };
 

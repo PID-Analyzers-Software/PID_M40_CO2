@@ -92,7 +92,10 @@ public:
         m_startMillis = millis();
     }
 
-    int getSelectedRange() { return m_rangeArray[m_selectedRange]; }
+    int getSelectedRange() {
+        int range = EEPROM.read(132);
+        return m_rangeArray[range];
+    }
 
     void onParamChange(String param, String value){
         Serial.println("onRangeParamChange: " + param + "=" + value);

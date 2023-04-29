@@ -68,7 +68,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
 
-  m_display->drawString(110, 0, String(String(v_b/33) + "%").c_str());
+  m_display->drawString(110, 0, String(String(v_b / 33) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawString(64, 0, "CO2");
@@ -90,7 +90,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
   m_display->drawString(117, 51, "Log");
 
-  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV,"+String(range)+"rg\n").c_str());
+  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
   m_display->display();
   delay(100);
 
@@ -324,20 +324,22 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->display();
 }
 
-SSD1306CalGasMenuRenderer::SSD1306CalGasMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager) : SSD1306MenuRenderer(display),
+SSD1306CalGasMenuRenderer::SSD1306CalGasMenuRenderer(SSD1306Wire* display, DataSource* dataSource, Range* range, GasManager* gasManager) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
+  m_range(range),
   m_gasManager(gasManager)
 {
 
 }
 void SSD1306CalGasMenuRenderer::render(Menu* menu)
 { m_display->clear();
+  int range = m_range->getSelectedRange();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(10, 16, 256, 16);
-  m_display->drawString(64, 22, "Cal Gas: 450 ppm");
-  m_display->drawString(64, 32, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 22, String("Cal gas: " + String(range/2)+" ppm").c_str());
+  m_display->drawString(64, 33, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();

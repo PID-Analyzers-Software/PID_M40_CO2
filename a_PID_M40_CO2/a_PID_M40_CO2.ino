@@ -139,7 +139,7 @@ void setup() {
   MenuRenderer* CalStartMenuRenderer = new SSD1306CalStartMenuRenderer(&display);
 
   MenuRenderer* ZEROMenuRenderer = new SSD1306ZEROMenuRenderer(&display, dataSource, &g_gasManager);
-  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource, &g_gasManager);
+  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource,&g_range, &g_gasManager);
   MenuRenderer* CalResMenuRenderer = new SSD1306CalResMenuRenderer(&display, &g_gasManager);
 
 #endif

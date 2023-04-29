@@ -7,6 +7,7 @@
 #include "ConfigurationManager.h"
 #include "Globals.h"
 #include <EEPROM.h>
+#include "RangeSet.h"
 
 
 class Gas
@@ -16,7 +17,6 @@ class Gas
     double m_intercept;
     double m_secondp;
     double m_thermalConductivity;
-
 public:
 
     Gas(String name, double thermalConductivity = 1.0) : m_name(name),
@@ -84,6 +84,7 @@ public:
     double getSecondp4() const { return m_secondp4; }
     double getZero() const {return m_zero; }
     double getCalgas() const {return m_calgas; }
+
     void setSlope(double s) { m_slope = s; }
     void setIntercept(double i) { m_intercept = i; }
     void setSecondp(double p) {m_secondp = p; }
@@ -161,18 +162,22 @@ public:
 
     void calibrate2(double cal){
         m_calgas = cal / 1000;
-        m_secondp = (m_calgas - m_zero) / 0.45;
+        int range=Range().getSelectedRange();
+        int calgasv = range/2000;
+        Serial.println(range);
+        Serial.println(" range is retrieved!!!!!!!!");
+        m_secondp = (m_calgas - m_zero) / calgasv;
         if(m_selectedGas==0) {
-            m_secondp = (m_calgas - m_zero) / 0.45;
+            m_secondp = (m_calgas - m_zero) / calgasv;
             EEPROM.writeDouble(20+m_selectedGas*16, m_secondp);
         }else if(m_selectedGas ==1){
-            m_secondp2 = (m_calgas - m_zero) / 0.45;
+            m_secondp2 = (m_calgas - m_zero) / calgasv;
             EEPROM.writeDouble(20+m_selectedGas*16, m_secondp2);
         }else if(m_selectedGas ==2){
-            m_secondp3 = (m_calgas - m_zero) / 0.45;
+            m_secondp3 = (m_calgas - m_zero) / calgasv;
             EEPROM.writeDouble(20+m_selectedGas*16, m_secondp3);
         }else if(m_selectedGas ==3){
-            m_secondp4 = (m_calgas - m_zero) / 0.45;
+            m_secondp4 = (m_calgas - m_zero) / calgasv;
             EEPROM.writeDouble(20+m_selectedGas*16, m_secondp4);
         }
         EEPROM.commit();
