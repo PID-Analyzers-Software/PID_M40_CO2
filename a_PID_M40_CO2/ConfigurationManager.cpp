@@ -24,8 +24,9 @@ void ConfigurationManager::loadFromEEPROM()
 	
 	//m_sleepTimer->selectIntervalByValue( timerInterval );	
 
-    int range = EEPROM.readInt(EEPROM_RANGE_OFFSET);
-    Serial.println("config: range interval: " + String(range));
+    int range = EEPROM.read(132);
+    Serial.println("config: range: " + String(range));
+    notifyParamChanged(c_RANGE_PARAM_NAME, String(range));
 
     int gasIndex = EEPROM.readInt(80);
     Serial.println("config: gas index: " + String(gasIndex));
@@ -131,21 +132,21 @@ void ConfigurationManager::loadFromEEPROM()
 	
 	///////////////
 
-	// WiFi SSID
-	char wifiSsid[32] = { 0 };
-	size_t readSsid = EEPROM.readString(EEPROM_WIFI_SSID_OFFSET, wifiSsid, 31);
-	if (readSsid > 0)
-		notifyParamChanged(c_WIFI_SSID_PARAM_NAME, String(wifiSsid));
-	Serial.println("config: WiFi SSID: " + String(wifiSsid));
-	m_wifiSsid = wifiSsid;
-
-	// WiFi PASSWORD
-	char wifiPsw[32] = { 0 };
-	size_t readPsw = EEPROM.readString(EEPROM_WIFI_PASSWORD_OFFSET, wifiPsw, 31);
-	if (readPsw > 0)
-		notifyParamChanged(c_WIFI_PASSWORD_PARAM_NAME, String(wifiPsw));
-	Serial.println("config: WiFi PSW: " + String(wifiPsw));
-	m_wifiPassword = wifiPsw;
+//	// WiFi SSID
+//	char wifiSsid[32] = { 0 };
+//	size_t readSsid = EEPROM.readString(EEPROM_WIFI_SSID_OFFSET, wifiSsid, 31);
+//	if (readSsid > 0)
+//		notifyParamChanged(c_WIFI_SSID_PARAM_NAME, String(wifiSsid));
+//	Serial.println("config: WiFi SSID: " + String(wifiSsid));
+//	m_wifiSsid = wifiSsid;
+//
+//	// WiFi PASSWORD
+//	char wifiPsw[32] = { 0 };
+//	size_t readPsw = EEPROM.readString(EEPROM_WIFI_PASSWORD_OFFSET, wifiPsw, 31);
+//	if (readPsw > 0)
+//		notifyParamChanged(c_WIFI_PASSWORD_PARAM_NAME, String(wifiPsw));
+//	Serial.println("config: WiFi PSW: " + String(wifiPsw));
+//	m_wifiPassword = wifiPsw;
 
 
 
@@ -244,9 +245,8 @@ void ConfigurationManager::saveTimerIntervalToEEPROM(int interval, bool doCommit
  {
 
      Serial.println("EEPROM saveRangeToEEPROM: " + String(range));
-     EEPROM.writeDouble(30, range);
+     EEPROM.writeInt(132, range);
      EEPROM.commit();
-
  }
 
 
@@ -254,7 +254,7 @@ void ConfigurationManager::saveTimerIntervalToEEPROM(int interval, bool doCommit
  {
 
      Serial.println("EEPROM saveAlarmToEEPROM: " + String(alarm));
-     EEPROM.writeDouble(196, alarm);
+     EEPROM.writeInt(196, alarm);
      EEPROM.commit();
 
  }

@@ -48,7 +48,7 @@ class ConfigurationManager : public ParamChangeListener
     const uint8_t EEPROM_DEVICE_ID_OFFSET = 132;			//64 chars
     const uint8_t EEPROM_WIFI_SSID_OFFSET = 164;		//32 chars
     const uint8_t EEPROM_WIFI_PASSWORD_OFFSET = 196;	//32 chars
-    const uint8_t EEPROM_RANGE_OFFSET = 36;	//uint16_t
+    const uint8_t EEPROM_RANGE_OFFSET = 132;	//uint16_t
     const uint8_t EEPROM_Alarm_OFFSET = 196;	//uint16_t
 
 
@@ -81,7 +81,9 @@ public:
 	void loadFromEEPROM();
 
 	void saveTimerIntervalToEEPROM(int interval, bool doCommit = true);
+
     void saveRangeToEEPROM(int range, bool doCommit = true);
+
     void saveAlarmToEEPROM(int alarm, bool doCommit = true);
 
     void saveGasSelectedToEEPROM(int gasIndex, bool doCommit = true);

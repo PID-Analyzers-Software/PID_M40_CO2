@@ -17,7 +17,6 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <vector>
-#include <DS3231M.h> // Include the DS3231M RTC library
 
 #include "inc/TimeSync.h"
 #include "inc/GasManager.h"
@@ -49,7 +48,6 @@ using namespace std;
 GasManager g_gasManager(1.73231201, -2.054456771, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
 WebServer g_webServer;
-DS3231M_Class DS3231M;                         ///< Create an instance of the DS3231M class
 
 CompositeMenu* g_mainMenu = nullptr;
 
@@ -94,7 +92,6 @@ void IRAM_ATTR dummyTouchISR() {}
 void setup() {
   Serial.begin(115200);
   Serial.println("PID M30 v230304");
-  DS3231M.pinSquareWave(); // Make INT/SQW pin toggle at 1Hz
   // DEEP-SLEEP init
   pinMode(25, OUTPUT);
 
@@ -195,8 +192,9 @@ void setup() {
 
   // Range Menus
   vector<Menu*> rangeMenus;
-  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  0, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("2500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  2, &g_range, rangeMenuRenderer));
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
@@ -263,7 +261,7 @@ void setup() {
 
   g_webServer.init(&g_gasManager);
   //g_sleepTimer.init(&g_configurationManager);
-  //  g_range.init(&g_configurationManager);
+  //g_range.init(&g_gasManager);
 
   g_dataLogger.init(dataSource, &g_gasManager);
 
@@ -272,6 +270,8 @@ void setup() {
 
   g_configurationManager.addParamChangeListener((ParamChangeListener*)&g_timeSync);
   g_configurationManager.addParamChangeListener((ParamChangeListener*)&g_gasManager);
+  //g_configurationManager.addParamChangeListener((ParamChangeListener*)&g_range);
+
   g_configurationManager.addParamChangeListener((ParamChangeListener*)g_dataLogger.getMqttFlashPublisher());
   g_configurationManager.addParamChangeListener((ParamChangeListener*)g_dataLogger.getMqttRealTimePublisher());
 
@@ -279,6 +279,8 @@ void setup() {
   g_configurationManager.loadFromEEPROM();
 
   g_timeSync.initTimeFromRTC();
+  int range = EEPROM.read(132);
+  g_range.selectRangeByIndex(range);
 }
 
 void setupButtons()
@@ -341,7 +343,6 @@ void setupButtons()
 
 void loop()
 {
-  DS3231M.adjust(DateTime(2023, 4, 28, 23, 39, 00));
 
   ButtonPressDetector::handleTick();
 

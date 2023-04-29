@@ -5,10 +5,11 @@
 #include "ConfigurationManager.h"
 #include <SSD1306.h>
 #include <Wire.h>
+#include <EEPROM.h>
 
 class Range
 {
-    std::array<int,2> m_rangeArray{{5000,10000}};
+    std::array<int,3> m_rangeArray{{2500, 5000,10000}};
     int m_selectedRange = 0;
 
     unsigned long m_startMillis = 0;
@@ -51,7 +52,10 @@ public:
         if(index >= 0 && index < m_rangeArray.size())
         {
             m_selectedRange = index;
-            m_configurationManager->saveRangeToEEPROM(index);
+            EEPROM.writeInt(132, index);
+            EEPROM.commit();
+            Serial.print("Range saved ");
+            Serial.println(index);
         }
 
         return;
@@ -89,5 +93,15 @@ public:
     }
 
     int getSelectedRange() { return m_rangeArray[m_selectedRange]; }
+
+    void onParamChange(String param, String value){
+        Serial.println("onRangeParamChange: " + param + "=" + value);
+
+        if(param.equals(c_RANGE_PARAM_NAME))
+        {
+            m_selectedRange = value.toInt();
+            Serial.println("Setting Range: " + value);
+        }
+    };
 
 };

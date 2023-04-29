@@ -90,7 +90,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
   m_display->drawString(117, 51, "Log");
 
-  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV,"+String(m_dataSource->getRawMiliVolts_battery())+"mV\n").c_str());
+  Serial.print((", " + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV,"+String(range)+"rg\n").c_str());
   m_display->display();
   delay(100);
 
