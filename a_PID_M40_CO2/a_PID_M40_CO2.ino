@@ -200,10 +200,10 @@ void setup() {
 
   // alarm Menus
   vector<Menu*> alarmMenus;
-  for (int i = 10; i <= 25; i++) {
-    int ppm = 250 + i * 25;
+  for (int i = 0; i <= 80; i++) {
+    int ppm = 500 + i * 25;
     String label = "Cal Gas";
-    alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i - 10, &g_alarm, alarmMenuRenderer));
+    alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, &g_alarm, alarmMenuRenderer));
   }
 
   CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
