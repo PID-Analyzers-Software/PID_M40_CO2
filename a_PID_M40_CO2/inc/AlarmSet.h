@@ -8,7 +8,7 @@
 
 class Alarm
 {
-    std::array<int,3> m_alarmArray{{300,500,0}};
+    std::array<int,16> m_alarmArray{{500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875}};
     int m_selectedAlarm = 0;
 
     unsigned long m_startMillis = 0;
@@ -51,7 +51,10 @@ public:
         if(index >= 0 && index < m_alarmArray.size())
         {
             m_selectedAlarm = index;
-            m_configurationManager->saveAlarmToEEPROM(index);
+            EEPROM.writeInt(150, index);
+            EEPROM.commit();
+            Serial.print("Alarm saved ");
+            Serial.println(index);
         }
 
         return;
@@ -88,6 +91,9 @@ public:
         m_startMillis = millis();
     }
 
-    int getSelectedAlarm() { return m_alarmArray[m_selectedAlarm]; }
+    int getSelectedAlarm() {
+        int alarm = EEPROM.read(150);
+        return m_alarmArray[alarm];
+    }
 
 };

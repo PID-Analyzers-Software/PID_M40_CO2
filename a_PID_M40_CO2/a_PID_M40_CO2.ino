@@ -139,7 +139,7 @@ void setup() {
   MenuRenderer* CalStartMenuRenderer = new SSD1306CalStartMenuRenderer(&display);
 
   MenuRenderer* ZEROMenuRenderer = new SSD1306ZEROMenuRenderer(&display, dataSource, &g_gasManager);
-  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource, &g_range, &g_gasManager);
+  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource, &g_alarm, &g_gasManager);
   MenuRenderer* CalResMenuRenderer = new SSD1306CalResMenuRenderer(&display, &g_gasManager);
 
 #endif
@@ -192,25 +192,19 @@ void setup() {
 
   // Range Menus
   vector<Menu*> rangeMenus;
-  rangeMenus.push_back(new RangeMenuItem("2500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("3000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("3500 ppm", "Range",  2, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("4000 ppm", "Range",  3, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("4500 ppm", "Range",  4, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range",  5, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("6000 ppm", "Range",  6, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("7000 ppm", "Range",  7, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("8000 ppm", "Range",  8, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("9000 ppm", "Range",  9, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range",  10, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("0-2500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("0-5000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
   // alarm Menus
   vector<Menu*> alarmMenus;
-  alarmMenus.push_back(new AlarmMenuItem("300 ppm", "Alarm",  0, &g_alarm, alarmMenuRenderer));
-  alarmMenus.push_back(new AlarmMenuItem("500 ppm", "Alarm",  1, &g_alarm, alarmMenuRenderer));
-  alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  2, &g_alarm, alarmMenuRenderer));
+  for (int i = 10; i <= 25; i++) {
+    int ppm = 250 + i * 25;
+    String label = "Cal Gas";
+    alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i - 10, &g_alarm, alarmMenuRenderer));
+  }
 
   CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
 
@@ -251,11 +245,10 @@ void setup() {
   //horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
   horizontalMenus.push_back(rangeMenu);
-  horizontalMenus.push_back(alarmMenu);
-
   //horizontalMenus.push_back(dataLoggerMenu);
-  horizontalMenus.push_back(dateTimeMenu);
+  //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
+  horizontalMenus.push_back(alarmMenu);
   horizontalMenus.push_back(calgasMenu);
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));

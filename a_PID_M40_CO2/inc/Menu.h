@@ -79,7 +79,7 @@ public:
 
     void action()
     {
-       //m_gasManager->selectGasByIndex(m_gasIndex);
+        //m_gasManager->selectGasByIndex(m_gasIndex);
     }
 
 };
@@ -400,4 +400,3 @@ public:
     }
 
 };
-

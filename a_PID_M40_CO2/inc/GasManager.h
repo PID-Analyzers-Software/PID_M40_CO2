@@ -7,7 +7,7 @@
 #include "ConfigurationManager.h"
 #include "Globals.h"
 #include <EEPROM.h>
-#include "RangeSet.h"
+#include "AlarmSet.h"
 
 
 class Gas
@@ -139,7 +139,7 @@ public:
         delay(20);
         if(m_selectedGas==0) {
             m_intercept = m_zero;
-            Serial.println("calibrating for gas 1");\
+            Serial.println("calibrating for gas 1");
             EEPROM.writeDouble(12+m_selectedGas*16, m_intercept);
         }else if(m_selectedGas ==1){
             m_intercept2 = m_zero;
@@ -162,13 +162,16 @@ public:
 
     void calibrate2(double cal){
         m_calgas = cal / 1000;
-        int range=Range().getSelectedRange();
-        int calgasv = range/2000;
-        Serial.println(range);
-        Serial.println(" range is retrieved!!!!!!!!");
+        int alarm=Alarm().getSelectedAlarm();
+        double calgasv = alarm/1000.0;
+        Serial.println("!!!!!!!!!!!!!!!");
+        Serial.println(alarm);
+        Serial.println(calgasv);
         m_secondp = (m_calgas - m_zero) / calgasv;
         if(m_selectedGas==0) {
             m_secondp = (m_calgas - m_zero) / calgasv;
+            Serial.println("calibrating for gas 1");
+            Serial.println(m_secondp);
             EEPROM.writeDouble(20+m_selectedGas*16, m_secondp);
         }else if(m_selectedGas ==1){
             m_secondp2 = (m_calgas - m_zero) / calgasv;
