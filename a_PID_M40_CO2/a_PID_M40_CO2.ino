@@ -244,7 +244,7 @@ void setup() {
   horizontalMenus.push_back(runMenu);
   //horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
-  horizontalMenus.push_back(rangeMenu);
+  //horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
@@ -281,7 +281,7 @@ void setup() {
 
   g_timeSync.initTimeFromRTC();
   int range = EEPROM.read(132);
-  g_range.selectRangeByIndex(range);
+  g_range.selectRangeByIndex(1);
 }
 
 void setupButtons()
