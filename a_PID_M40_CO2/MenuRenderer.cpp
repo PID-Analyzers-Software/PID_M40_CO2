@@ -3,7 +3,7 @@
 #include "inc/SleepTimer.h"
 #include "inc/DataSource.h"
 #include "inc/RangeSet.h"
-#include "inc/AlarmSet.h"
+#include "inc/CalvalueSet.h"
 
 #include <Adafruit_ADS1015.h>
 #include "SSD1306.h"
@@ -30,11 +30,11 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range, Alarm* alarm) : SSD1306MenuRenderer(display),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Range* range, Calvalue* calvalue) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
   m_gasManager(gasManager),
   m_range(range),
-  m_alarm(alarm)
+  m_calvalue(calvalue)
 {
 
 }
@@ -45,7 +45,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 {
   const float multiplier = 0.125F; //GAIN 1
   int range = m_range->getSelectedRange();
-  int alarm = m_alarm->getSelectedAlarm();
+  int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
   int v_b = m_dataSource->getRawMiliVolts_battery();
   Gas& selectedGas = m_gasManager->getSelectedGas();
@@ -68,7 +68,8 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
 
-  m_display->drawString(110, 0, String(String(v_b / 33) + "%").c_str());
+  m_display->drawString(110, 0, String(String(v_b*0.1-300.0,0) + "%").c_str());
+  Serial.println(v_b);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawString(64, 0, "CO2");
@@ -85,7 +86,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(105, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  //  if (alarm != 0) {
+  //  if (calvalue != 0) {
   //    m_display->drawString(12, 51, "Alm");
   //  }
   m_display->drawString(117, 51, "Log");
@@ -140,14 +141,14 @@ void SSD1306RangeMenuRenderer::render(Menu* menu)
 }
 
 ///////////////////////////////
-SSD1306AlarmMenuRenderer::SSD1306AlarmMenuRenderer(SSD1306Wire* display, Alarm* alarm) : SSD1306MenuRenderer(display),
-  m_alarm(alarm)
+SSD1306CalvalueMenuRenderer::SSD1306CalvalueMenuRenderer(SSD1306Wire* display, Calvalue* calvalue) : SSD1306MenuRenderer(display),
+  m_calvalue(calvalue)
 {
 }
 
-void SSD1306AlarmMenuRenderer::render(Menu* menu)
+void SSD1306CalvalueMenuRenderer::render(Menu* menu)
 {
-  int alarm = m_alarm->getSelectedAlarm();
+  int calvalue = m_calvalue->getSelectedCalvalue();
 
   m_display->clear();
   m_display->setColor(WHITE);
@@ -329,21 +330,21 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->display();
 }
 
-SSD1306CalGasMenuRenderer::SSD1306CalGasMenuRenderer(SSD1306Wire* display, DataSource* dataSource, Alarm* alarm, GasManager* gasManager) : SSD1306MenuRenderer(display),
+SSD1306CalGasMenuRenderer::SSD1306CalGasMenuRenderer(SSD1306Wire* display, DataSource* dataSource, Calvalue* calvalue, GasManager* gasManager) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
-  m_alarm(alarm),
+  m_calvalue(calvalue),
   m_gasManager(gasManager)
 {
 
 }
 void SSD1306CalGasMenuRenderer::render(Menu* menu)
 { m_display->clear();
-  int alarm = m_alarm->getSelectedAlarm();
+  int calvalue = m_calvalue->getSelectedCalvalue();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(10, 16, 256, 16);
-  m_display->drawString(64, 22, String("Cal gas: " + String(alarm) + " ppm").c_str());
+  m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
   m_display->drawString(64, 33, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 

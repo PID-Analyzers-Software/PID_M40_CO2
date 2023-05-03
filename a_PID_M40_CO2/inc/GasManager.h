@@ -7,7 +7,7 @@
 #include "ConfigurationManager.h"
 #include "Globals.h"
 #include <EEPROM.h>
-#include "AlarmSet.h"
+#include "CalvalueSet.h"
 
 
 class Gas
@@ -162,10 +162,10 @@ public:
 
     void calibrate2(double cal){
         m_calgas = cal / 1000;
-        int alarm=Alarm().getSelectedAlarm();
-        double calgasv = alarm/1000.0;
+        int calvalue=Calvalue().getSelectedCalvalue();
+        double calgasv = calvalue/1000.0;
         Serial.println("!!!!!!!!!!!!!!!");
-        Serial.println(alarm);
+        Serial.println(calvalue);
         Serial.println(calgasv);
         m_secondp = (m_calgas - m_zero) / calgasv;
         if(m_selectedGas==0) {

@@ -4,7 +4,7 @@
 #include "MenuRenderer.h"
 #include "SleepTimer.h"
 #include "RangeSet.h"
-#include "AlarmSet.h"
+#include "CalvalueSet.h"
 #include "DataLogger.h"
 #include "TimeSync.h"
 #include "DataSource.h"
@@ -131,25 +131,25 @@ public:
 
 };
 
-class AlarmMenuItem : public Menu
+class CalvalueMenuItem : public Menu
 {
-    Alarm* m_alarm  ;
+    Calvalue* m_calvalue  ;
 
-    int m_alarmIndex;
+    int m_calvalueIndex;
 
 public:
 
-    AlarmMenuItem(String name, String parentName, int alarmIndex, Alarm* alarm, MenuRenderer* renderer)
+    CalvalueMenuItem(String name, String parentName, int calvalueIndex, Calvalue* calvalue, MenuRenderer* renderer)
             : Menu(name, parentName, renderer),
-              m_alarm(alarm),
-              m_alarmIndex(alarmIndex)
+              m_calvalue(calvalue),
+              m_calvalueIndex(calvalueIndex)
     {
 
     }
 
     void action()
     {
-        m_alarm->selectAlarmByIndex(m_alarmIndex);
+        m_calvalue->selectCalvalueByIndex(m_calvalueIndex);
     }
 
 };

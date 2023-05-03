@@ -26,7 +26,7 @@
 #include "inc/WebServer.h"
 #include "inc/SleepTimer.h"
 #include "inc/RangeSet.h"
-#include "inc/AlarmSet.h"
+#include "inc/CalvalueSet.h"
 #include "inc/Globals.h"
 #include "inc/DataLogger.h"
 #include "inc/DataSource.h"
@@ -64,7 +64,7 @@ U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI display(U8G2_R0, /* clock=*/ 27, /* data=
 SleepTimer g_sleepTimer;
 
 Range g_range;
-Alarm g_alarm;
+Calvalue g_calvalue;
 
 DataLogger g_dataLogger;
 
@@ -126,10 +126,10 @@ void setup() {
   //display.setFont(ArialMT_Plain_16);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_range, &g_alarm);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_range, &g_calvalue);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
-  MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
+  MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
   MenuRenderer* wifiDumpMenuRenderer = new SSD1306WiFiDumpMenuRenderer(&display, &g_dataLogger);
@@ -139,7 +139,7 @@ void setup() {
   MenuRenderer* CalStartMenuRenderer = new SSD1306CalStartMenuRenderer(&display);
 
   MenuRenderer* ZEROMenuRenderer = new SSD1306ZEROMenuRenderer(&display, dataSource, &g_gasManager);
-  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource, &g_alarm, &g_gasManager);
+  MenuRenderer* CalGasMenuRenderer = new SSD1306CalGasMenuRenderer(&display, dataSource, &g_calvalue, &g_gasManager);
   MenuRenderer* CalResMenuRenderer = new SSD1306CalResMenuRenderer(&display, &g_gasManager);
 
 #endif
@@ -198,15 +198,15 @@ void setup() {
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
-  // alarm Menus
-  vector<Menu*> alarmMenus;
+  // calvalue Menus
+  vector<Menu*> calvalueMenus;
   for (int i = 0; i <= 80; i++) {
     int ppm = 500 + i * 25;
     String label = "Cal Gas";
-    alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, &g_alarm, alarmMenuRenderer));
+    calvalueMenus.push_back(new CalvalueMenuItem(String(ppm) + " ppm", label, i, &g_calvalue, calvalueMenuRenderer));
   }
 
-  CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
+  CompositeMenu* calvalueMenu = new CompositeMenu("Calvalue", "Main Menu" , calvalueMenus);
 
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
@@ -248,7 +248,7 @@ void setup() {
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(calMenu);
-  horizontalMenus.push_back(alarmMenu);
+  horizontalMenus.push_back(calvalueMenu);
   horizontalMenus.push_back(calgasMenu);
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));
