@@ -68,7 +68,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
 
-  m_display->drawString(110, 0, String(String(v_b*0.1-300.0,0) + "%").c_str());
+  m_display->drawString(110, 0, String(String(v_b*0.08333-250.0,0) + "%").c_str());
   Serial.println(v_b);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
