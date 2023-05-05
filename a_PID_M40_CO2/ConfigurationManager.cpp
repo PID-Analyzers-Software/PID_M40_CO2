@@ -28,6 +28,10 @@ void ConfigurationManager::loadFromEEPROM()
     Serial.println("config: range: " + String(range));
     notifyParamChanged(c_RANGE_PARAM_NAME, String(range));
 
+    int alarm = EEPROM.read(132);
+    Serial.println("config: alarm: " + String(alarm));
+    notifyParamChanged(c_ALARM_PARAM_NAME, String(alarm));
+
     int gasIndex = EEPROM.readInt(80);
     Serial.println("config: gas index: " + String(gasIndex));
     notifyParamChanged(c_GASINDEX_PARAM_NAME, String(gasIndex));
@@ -246,6 +250,14 @@ void ConfigurationManager::saveTimerIntervalToEEPROM(int interval, bool doCommit
 
      Serial.println("EEPROM saveRangeToEEPROM: " + String(range));
      EEPROM.writeInt(132, range);
+     EEPROM.commit();
+ }
+
+ void ConfigurationManager::saveAlarmToEEPROM(int alarm, bool doCommit)
+ {
+
+     Serial.println("EEPROM saveAlarmToEEPROM: " + String(alarm));
+     EEPROM.writeInt(162, alarm);
      EEPROM.commit();
  }
 

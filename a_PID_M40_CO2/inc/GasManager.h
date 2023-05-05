@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include <EEPROM.h>
 #include "CalvalueSet.h"
+#include "AlarmSet.h"
 
 
 class Gas

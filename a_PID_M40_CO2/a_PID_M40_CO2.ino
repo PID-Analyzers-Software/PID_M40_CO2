@@ -26,6 +26,10 @@
 #include "inc/WebServer.h"
 #include "inc/SleepTimer.h"
 #include "inc/RangeSet.h"
+#include "inc/AlarmSet.h"
+#include "inc/HourSet.h"
+#include "inc/MinuteSet.h"
+
 #include "inc/CalvalueSet.h"
 #include "inc/Globals.h"
 #include "inc/DataLogger.h"
@@ -64,6 +68,9 @@ U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI display(U8G2_R0, /* clock=*/ 27, /* data=
 SleepTimer g_sleepTimer;
 
 Range g_range;
+Alarm g_alarm;
+Hour g_hour;
+Minute g_minute;
 Calvalue g_calvalue;
 
 DataLogger g_dataLogger;
@@ -126,9 +133,12 @@ void setup() {
   //display.setFont(ArialMT_Plain_16);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_range, &g_calvalue);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_alarm, &g_range, &g_calvalue);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
+  MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
+  MenuRenderer* hourMenuRenderer = new SSD1306HourMenuRenderer(&display, &g_hour);
+  MenuRenderer* minuteMenuRenderer = new SSD1306MinuteMenuRenderer(&display, &g_minute);
   MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
@@ -195,8 +205,36 @@ void setup() {
   rangeMenus.push_back(new RangeMenuItem("0-2500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
   rangeMenus.push_back(new RangeMenuItem("0-5000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
 
-
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
+
+
+  // Range Menus
+  vector<Menu*> alarmMenus;
+  alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  0, &g_alarm, alarmMenuRenderer));
+  alarmMenus.push_back(new AlarmMenuItem("1000", "Alarm",  1, &g_alarm, alarmMenuRenderer));
+  alarmMenus.push_back(new AlarmMenuItem("1200", "Alarm",  2, &g_alarm, alarmMenuRenderer));
+
+  CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
+
+  // Hour Menus
+  vector<Menu*> minuteMenus;
+  for (int i = 0; i <= 59; i++) {
+    String label = "Set Minute";
+    minuteMenus.push_back(new MinuteMenuItem(String(i) , label, i, &g_minute, minuteMenuRenderer));
+  }
+
+  CompositeMenu* minuteMenu = new CompositeMenu("Set Minute", "Main Menu" , minuteMenus);
+
+  // Minute Menus
+
+  vector<Menu*> hourMenus;
+  for (int i = 0; i <= 23; i++) {
+    String label = "Set Hour";
+    hourMenus.push_back(new HourMenuItem(String(i) , label, i, &g_hour, hourMenuRenderer));
+  }
+
+  CompositeMenu* hourMenu = new CompositeMenu("Set Hour", "Main Menu" , hourMenus);
+
 
   // calvalue Menus
   vector<Menu*> calvalueMenus;
@@ -247,6 +285,10 @@ void setup() {
   //horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
+  horizontalMenus.push_back(alarmMenu);
+  horizontalMenus.push_back(hourMenu);
+  horizontalMenus.push_back(minuteMenu);
+
   horizontalMenus.push_back(calMenu);
   horizontalMenus.push_back(calvalueMenu);
   horizontalMenus.push_back(calgasMenu);
@@ -282,6 +324,8 @@ void setup() {
   g_timeSync.initTimeFromRTC();
   int range = EEPROM.read(132);
   g_range.selectRangeByIndex(1);
+  int alarm = EEPROM.read(162);
+  g_alarm.selectAlarmByIndex(alarm);
 }
 
 void setupButtons()
@@ -308,6 +352,9 @@ void setupButtons()
       return;
     Serial.println("PRESS S");
     g_mainMenu->action();
+    
+    g_timeSync.initTimeFromRTC();
+
   });
   keyboard->addOnRightPressedFctor([] {
 

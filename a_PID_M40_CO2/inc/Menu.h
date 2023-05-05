@@ -4,6 +4,10 @@
 #include "MenuRenderer.h"
 #include "SleepTimer.h"
 #include "RangeSet.h"
+#include "AlarmSet.h"
+#include "HourSet.h"
+#include "MinuteSet.h"
+
 #include "CalvalueSet.h"
 #include "DataLogger.h"
 #include "TimeSync.h"
@@ -129,7 +133,81 @@ public:
         m_range->selectRangeByIndex(m_rangeIndex);
     }
 
+    void render()
+    {
+        m_menuRenderer->render(this);
+    }
+
 };
+
+class AlarmMenuItem : public Menu
+{
+    Alarm* m_alarm;
+
+    int m_alarmIndex;
+
+public:
+
+    AlarmMenuItem(String name, String parentName, int alarmIndex, Alarm* alarm, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_alarm(alarm),
+              m_alarmIndex(alarmIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_alarm->selectAlarmByIndex(m_alarmIndex);
+    }
+};
+
+
+class HourMenuItem : public Menu
+{
+    Hour* m_hour;
+
+    int m_hourIndex;
+
+public:
+
+    HourMenuItem(String name, String parentName, int hourIndex, Hour* hour, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_hour(hour),
+              m_hourIndex(hourIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_hour->selectHourByIndex(m_hourIndex);
+    }
+};
+
+
+class MinuteMenuItem : public Menu
+{
+    Minute* m_minute;
+
+    int m_minuteIndex;
+
+public:
+
+    MinuteMenuItem(String name, String parentName, int minuteIndex, Minute* minute, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_minute(minute),
+              m_minuteIndex(minuteIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_minute->selectMinuteByIndex(m_minuteIndex);
+    }
+};
+
 
 class CalvalueMenuItem : public Menu
 {
@@ -371,6 +449,13 @@ public:
     void moveToNext()
     {
         m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        if(m_currentIndex == 3){
+            m_currentIndex = 4;
+        }
+        if(m_currentIndex == 5){
+            m_currentIndex = 0;
+        }
+
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );
         Serial.println("moveToNext: " + m_menuName );
         Serial.flush();
@@ -379,7 +464,7 @@ public:
     void action() override
     {
         m_menus[m_currentIndex]->action();
-
+        Serial.println(m_currentIndex);
         m_currentIndex = (m_currentIndex + 1) % m_menus.size();
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );
         Serial.println("moveToNext: " + m_menuName );

@@ -8,8 +8,7 @@
 
 class Alarm
 {
-    std::array<int,81> m_alarmArray{{500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300, 1325, 1350, 1375, 1400, 1425, 1450, 1475, 1500, 1525, 1550, 1575, 1600, 1625, 1650, 1675, 1700, 1725, 1750, 1775, 1800, 1825, 1850, 1875, 1900, 1925, 1950, 1975, 2000, 2025, 2050, 2075, 2100, 2125, 2150, 2175, 2200, 2225, 2250, 2275, 2300, 2325, 2350, 2375, 2400, 2425, 2450, 2475, 2500}};
-
+    std::array<int,3> m_alarmArray{{500, 1000, 1200}};
     int m_selectedAlarm = 0;
 
     unsigned long m_startMillis = 0;
@@ -52,7 +51,7 @@ public:
         if(index >= 0 && index < m_alarmArray.size())
         {
             m_selectedAlarm = index;
-            EEPROM.writeInt(150, index);
+            EEPROM.writeInt(162, index);
             EEPROM.commit();
             Serial.print("Alarm saved ");
             Serial.println(index);
@@ -93,7 +92,7 @@ public:
     }
 
     int getSelectedAlarm() {
-        int alarm = EEPROM.read(150);
+        int alarm = EEPROM.read(162);
         return m_alarmArray[alarm];
     }
 

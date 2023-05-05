@@ -50,6 +50,7 @@ class ConfigurationManager : public ParamChangeListener
     const uint8_t EEPROM_WIFI_PASSWORD_OFFSET = 196;	//32 chars
     const uint8_t EEPROM_RANGE_OFFSET = 132;	//uint16_t
     const uint8_t EEPROM_Calvalue_OFFSET = 150;	//uint16_t
+    const uint8_t EEPROM_ALARM_OFFSET = 162;	//uint16_t
 
 
     const uint8_t EEPROM_GAS_AIR_TC_OFFSET = 999;
@@ -83,6 +84,7 @@ public:
 	void saveTimerIntervalToEEPROM(int interval, bool doCommit = true);
 
     void saveRangeToEEPROM(int range, bool doCommit = true);
+    void saveAlarmToEEPROM(int alarm, bool doCommit = true);
 
     void saveCalvalueToEEPROM(int calvalue, bool doCommit = true);
 

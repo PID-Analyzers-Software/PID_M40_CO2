@@ -19,6 +19,7 @@ const char* c_MQTT_SERVER_URL_PARAM_NAME = "mqttServerUrl";
 const char* c_SLOPE_PARAM_NAME = "SLOPE";
 const char* c_GASINDEX_PARAM_NAME = "GASINDEX";
 const char* c_RANGE_PARAM_NAME = "RANGE";
+const char* c_ALARM_PARAM_NAME = "ALARM";
 
 const char* c_INTERCEPT_PARAM_NAME = "INTERCEPT";
 const char* c_SECONDP_PARAM_NAME = "SECONDP";

@@ -30,6 +30,7 @@ extern const char* c_SECONDP4_PARAM_NAME;
 
 extern const char* c_GASINDEX_PARAM_NAME;
 extern const char* c_RANGE_PARAM_NAME;
+extern const char* c_ALARM_PARAM_NAME;
 
 extern const char* c_GAS_AIR_PARAM_NAME;
 extern const char* c_GAS_O2_PARAM_NAME;
