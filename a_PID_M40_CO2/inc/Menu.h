@@ -467,7 +467,14 @@ public:
     {
         m_menus[m_currentIndex]->action();
         Serial.println(m_currentIndex);
-        m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        Serial.println(m_menuName);
+        if(m_currentIndex == 0 & m_menuName == "Main Menu") {
+            Serial.println("no skip");
+        }else if ( m_menuName == "RUN"){
+            Serial.println("no skip");
+        }else{
+            m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        }
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );
         Serial.println("moveToNext: " + m_menuName );
         Serial.flush();
