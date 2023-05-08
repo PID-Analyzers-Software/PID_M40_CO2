@@ -173,8 +173,8 @@ void setup() {
   vector<Menu*> runMenus;
 
   runMenus.push_back(new RunMenuItem(" ", "RUN",0, &g_gasManager, runMenuRenderer));
-  runMenus.push_back(new RunMenuItem("L Log", "RUN",1, &g_gasManager, runMenuRenderer));
-  runMenus.push_back(new RunMenuItem("P Log", "RUN",1, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("L", "RUN",1, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("P", "RUN",1, &g_gasManager, runMenuRenderer));
 
   CompositeMenu* runMenu = new CompositeMenu("RUN", "Main Menu", runMenus);
 
