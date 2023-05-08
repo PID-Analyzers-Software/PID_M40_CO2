@@ -120,7 +120,9 @@ public:
 
     void addGas(Gas g) { m_gases.push_back(g); }
 
-
+    void printinfo(){
+        Serial.println("S Button Pushed!!!!!!  ");
+    }
 
     void selectGasByIndex(int index)
     {

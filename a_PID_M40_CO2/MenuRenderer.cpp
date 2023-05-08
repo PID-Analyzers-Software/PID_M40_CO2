@@ -73,13 +73,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(0, 0, String(timeString));
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-
-  m_display->drawString(110, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%").c_str());
-  Serial.println(v_b);
+  m_display->drawString(64, 0, "26.2 30%RH");
+  m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
-  m_display->drawString(64, 0, "CO2");
-  //m_display->drawString(64, 0, String(selectedGas.getName()).c_str());
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
   if (m_dataSource->getDoubleValue() > range) {
@@ -89,15 +85,17 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   }
   m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(105, 30, "ppm");   //Unit
+  m_display->drawString(12, 30, "CO2");   //Unit
+  m_display->drawString(115, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  if (alarm != 500) {
+  if (alarm != 0) {
     m_display->drawString(12, 51, "Alm");
   }
-  m_display->drawString(117, 51, "Log");
-
-  Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
+  m_display->drawString(110, 51, String(menu->getName()));
+  if (menu->getName() == "L Log") {
+    Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
+  }
   m_display->display();
   delay(100);
 
@@ -171,43 +169,43 @@ void SSD1306AlarmMenuRenderer::render(Menu* menu)
 ///////////////////////////
 
 SSD1306HourMenuRenderer::SSD1306HourMenuRenderer(SSD1306Wire* display, Hour* hour) : SSD1306MenuRenderer(display),
-                                                                                         m_hour(hour)
+  m_hour(hour)
 {
 }
 
 void SSD1306HourMenuRenderer::render(Menu* menu)
 {
-    int hour = m_hour->getSelectedHour();
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->drawString(64, 0, "Hour");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_24);
-    m_display->drawString(64, 28 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->display();
+  int hour = m_hour->getSelectedHour();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->drawString(64, 0, "Hour");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_24);
+  m_display->drawString(64, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
 }
 
 ///////////////////////////
 
 SSD1306MinuteMenuRenderer::SSD1306MinuteMenuRenderer(SSD1306Wire* display, Minute* minute) : SSD1306MenuRenderer(display),
-                                                                                     m_minute(minute)
+  m_minute(minute)
 {
 }
 
 void SSD1306MinuteMenuRenderer::render(Menu* menu)
 {
-    int minute = m_minute->getSelectedMinute();
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->drawString(64, 0, "Minute");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_24);
-    m_display->drawString(64, 28 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->display();
+  int minute = m_minute->getSelectedMinute();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->drawString(64, 0, "Minute");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_24);
+  m_display->drawString(64, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
 }
 
 

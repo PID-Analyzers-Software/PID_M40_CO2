@@ -169,9 +169,13 @@ void setup() {
   MenuRenderer* showTimeMenuRenderer = new SSD1327ShowTimeMenuRenderer(&display);
 #endif
 
+  // Run Menus
   vector<Menu*> runMenus;
 
-  runMenus.push_back(new RunMenuItem("RUN", "RUN", &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem(" ", "RUN",0, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("L Log", "RUN",1, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("P Log", "RUN",1, &g_gasManager, runMenuRenderer));
+
   CompositeMenu* runMenu = new CompositeMenu("RUN", "Main Menu", runMenus);
 
   // Gas Menus
@@ -208,11 +212,17 @@ void setup() {
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
 
-  // Range Menus
+  // Alarm Menus
   vector<Menu*> alarmMenus;
-  alarmMenus.push_back(new AlarmMenuItem("off", "Alarm",  0, &g_alarm, alarmMenuRenderer));
-  alarmMenus.push_back(new AlarmMenuItem("1000", "Alarm",  1, &g_alarm, alarmMenuRenderer));
-  alarmMenus.push_back(new AlarmMenuItem("1200", "Alarm",  2, &g_alarm, alarmMenuRenderer));
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "Alarm";
+    if (ppm == 475) {
+      alarmMenus.push_back(new AlarmMenuItem("Off", label, i, &g_alarm, alarmMenuRenderer));
+    } else {
+      alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, &g_alarm, alarmMenuRenderer));
+    }
+  }
 
   CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
 
@@ -352,7 +362,7 @@ void setupButtons()
       return;
     Serial.println("PRESS S");
     g_mainMenu->action();
-    
+
     g_timeSync.initTimeFromRTC();
 
   });

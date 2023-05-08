@@ -71,19 +71,21 @@ public:
 class RunMenuItem : public Menu
 {
     GasManager* m_gasManager;
+    int m_menuIndex;
 
 public:
 
-    RunMenuItem(String name, String parentName, GasManager* gasManager, MenuRenderer* renderer)
+    RunMenuItem(String name, String parentName,int menuIndex, GasManager* gasManager, MenuRenderer* renderer)
             : Menu(name, parentName, renderer),
-              m_gasManager(gasManager)
+              m_gasManager(gasManager),
+              m_menuIndex(menuIndex)
     {
 
     }
 
     void action()
     {
-        //m_gasManager->selectGasByIndex(m_gasIndex);
+        m_gasManager->printinfo();
     }
 
 };
@@ -449,13 +451,13 @@ public:
     void moveToNext()
     {
         m_currentIndex = (m_currentIndex + 1) % m_menus.size();
-//         if(m_currentIndex == 3){
-//             m_currentIndex = 4;
-//         }
-//         if(m_currentIndex == 5){
-//             m_currentIndex = 0;
-//         }
-
+        if(m_currentIndex == 3 & m_menuName == "Main Menu"){
+            m_currentIndex = 4;
+        }
+        if(m_currentIndex == 5 & m_menuName == "Main Menu"){
+            m_currentIndex = 0;
+        }
+        Serial.println(m_parentMenuName);
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );
         Serial.println("moveToNext: " + m_menuName );
         Serial.flush();
