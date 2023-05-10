@@ -45,7 +45,7 @@ public:
 
         if(now - m_lastReadValueTick > 1000 / m_refreshRate)
         {
-            const int numReadings  = 5;
+            const int numReadings  = 2;
             long total  = 0;
             m_lastReadValueTick = now;
             const float multiplier = 0.125F; //GAIN 1
@@ -54,6 +54,7 @@ public:
                 total = total +m_ads1115->readADC_SingleEnded(0) * multiplier;
             }
             m_lastReadValue = total / numReadings;
+
         }
         return m_lastReadValue;
     }
@@ -62,12 +63,17 @@ public:
     {
         unsigned long now = millis();
 
-        if(now - m_lastReadValueTick_b > 3000 / m_refreshRate_b) {
+        if(now - m_lastReadValueTick_b > 5000 / m_refreshRate_b) {
+            const int numReadings  = 2;
+            long total  = 0;
             m_lastReadValueTick_b = now;
-
             const float multiplier = 0.125F; //GAIN 1
 
-            m_lastReadValue_battery = m_ads1115->readADC_SingleEnded(1) * multiplier;// / 1000.0;
+            for (int i = 0; i<numReadings; i++) {
+                total = total +analogRead(27)*0.80586;
+            }
+            m_lastReadValue_battery = total / numReadings;
+
         }
         return m_lastReadValue_battery;
     }
