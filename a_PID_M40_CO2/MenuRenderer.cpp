@@ -74,7 +74,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "26C 30%RH");
-  m_display->drawString(114, 0, String(String(v_b * 0.08333*2 - 250.0, 0) + "%").c_str());
+  m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
