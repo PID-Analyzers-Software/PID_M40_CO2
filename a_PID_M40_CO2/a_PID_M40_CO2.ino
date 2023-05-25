@@ -131,7 +131,7 @@ void setup() {
   display.init();
   display.flipScreenVertically();
   //display.setFont(ArialMT_Plain_16);
-  display.drawXbm(0,0, 128, 61, image_arr);
+  display.drawXbm(0,0, 128, 60, image_arr);
   display.display();
   delay(4000);
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
