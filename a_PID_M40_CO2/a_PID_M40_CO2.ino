@@ -29,10 +29,13 @@
 #include "inc/AlarmSet.h"
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
+#include "inc/SiteidSet.h"
+#include "inc/LogtimeSet.h"
 
 #include "inc/CalvalueSet.h"
 #include "inc/Globals.h"
 #include "inc/DataLogger.h"
+#include "inc/DataSource.h"
 #include "inc/DataSource.h"
 
 #include "inc/image.h"
@@ -72,7 +75,8 @@ Alarm g_alarm;
 Hour g_hour;
 Minute g_minute;
 Calvalue g_calvalue;
-
+Siteid g_siteid;
+Logtime g_logtime;
 DataLogger g_dataLogger;
 
 TimeSync g_timeSync;
@@ -142,6 +146,8 @@ void setup() {
   MenuRenderer* hourMenuRenderer = new SSD1306HourMenuRenderer(&display, &g_hour);
   MenuRenderer* minuteMenuRenderer = new SSD1306MinuteMenuRenderer(&display, &g_minute);
   MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
+  MenuRenderer* siteidMenuRenderer = new SSD1306SiteidMenuRenderer(&display, &g_siteid);
+  MenuRenderer* logtimeMenuRenderer = new SSD1306LogtimeMenuRenderer(&display, &g_logtime);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
   MenuRenderer* wifiDumpMenuRenderer = new SSD1306WiFiDumpMenuRenderer(&display, &g_dataLogger);
@@ -287,6 +293,15 @@ void setup() {
   calgasMenus.push_back(new CalMenuItemCalGas("Cal Gas", dataSource, &g_gasManager, "CalGas", CalGasMenuRenderer));
   CompositeMenu* calgasMenu = new CompositeMenu("CALIBRATION Calgas", "Main Menu", calgasMenus);
 
+  // Site ID menu
+    vector<Menu*> siteidMenus;
+    siteidMenus.push_back(new SiteidMenuItem("1", "SiteID", 0, &g_siteid, siteidMenuRenderer));
+    CompositeMenu* siteidMenu = new CompositeMenu("Site ID", "Main Menu", siteidMenus);
+
+    // Site ID menu
+    vector<Menu*> logtimeMenus;
+    logtimeMenus.push_back(new LogtimeMenuItem("1", "Log Duration", 0, &g_logtime, logtimeMenuRenderer));
+    CompositeMenu* logtimeMenu = new CompositeMenu("Log Duration", "Main Menu", logtimeMenus);
 
   ////////////////////////////////////
   vector<Menu*> horizontalMenus;
@@ -304,6 +319,8 @@ void setup() {
   horizontalMenus.push_back(calMenu);
   horizontalMenus.push_back(calvalueMenu);
   horizontalMenus.push_back(calgasMenu);
+  horizontalMenus.push_back(siteidMenu);
+  horizontalMenus.push_back(logtimeMenu);
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));
   CompositeMenu* verticalMenu = new CompositeMenu("Main Menu", "", horizontalMenus);

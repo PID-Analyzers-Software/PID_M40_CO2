@@ -234,6 +234,52 @@ void SSD1306CalvalueMenuRenderer::render(Menu* menu)
 
 ///////////////////////////////
 
+SSD1306SiteidMenuRenderer::SSD1306SiteidMenuRenderer(SSD1306Wire* display, Siteid* siteid) : SSD1306MenuRenderer(display),
+                                                                                                     m_siteid(siteid)
+{
+}
+
+void SSD1306SiteidMenuRenderer::render(Menu* menu)
+{
+    int siteid = m_siteid->getSelectedSiteid();
+
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(64, 0, "Site ID");
+    m_display->drawLine(0, 16, 256, 16);
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(70, 28 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->display();
+}
+
+///////////////////////////////
+
+SSD1306LogtimeMenuRenderer::SSD1306LogtimeMenuRenderer(SSD1306Wire* display, Logtime* logtime) : SSD1306MenuRenderer(display),
+                                                                                                     m_logtime(logtime)
+{
+}
+
+void SSD1306LogtimeMenuRenderer::render(Menu* menu)
+{
+    int logtime = m_logtime->getSelectedLogtime();
+
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(64, 0, "Log Duration");
+    m_display->drawLine(0, 16, 256, 16);
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(70, 28 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->display();
+}
+
+///////////////////////////////
+
 SSD1306FlashLoggerMenuRenderer::SSD1306FlashLoggerMenuRenderer(SSD1306Wire* display, DataLogger* dataLogger) : SSD1306MenuRenderer(display),
   m_dataLogger(dataLogger)
 {
@@ -349,14 +395,7 @@ void SSD1306ShowTimeMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 28, String(dateString));
   m_display->drawString(64, 45, String(timeString));
   m_display->display();
-
-
-
 }
-
-
-
-
 
 
 

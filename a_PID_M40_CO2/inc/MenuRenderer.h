@@ -16,7 +16,8 @@ class Alarm;
 class Calvalue;
 class Hour;
 class Minute;
-
+class Siteid;
+class Logtime;
 
 class MenuRenderer
 {
@@ -99,6 +100,29 @@ public:
     void render(Menu* menu);
 };
 
+
+class SSD1306SiteidMenuRenderer : public SSD1306MenuRenderer
+{
+    Siteid* m_siteid;
+
+public:
+
+    SSD1306SiteidMenuRenderer(SSD1306Wire* display, Siteid* siteid);
+
+    void render(Menu* menu);
+};
+
+
+class SSD1306LogtimeMenuRenderer : public SSD1306MenuRenderer
+{
+    Logtime* m_logtime;
+
+public:
+
+    SSD1306LogtimeMenuRenderer(SSD1306Wire* display, Logtime* logtime);
+
+    void render(Menu* menu);
+};
 
 class SSD1306HourMenuRenderer : public SSD1306MenuRenderer
 {

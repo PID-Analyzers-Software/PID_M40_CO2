@@ -12,7 +12,8 @@
 #include "DataLogger.h"
 #include "TimeSync.h"
 #include "DataSource.h"
-
+#include "SiteidSet.h"
+#include "LogtimeSet.h"
 
 class Menu
 {
@@ -133,6 +134,63 @@ public:
     void action()
     {
         m_range->selectRangeByIndex(m_rangeIndex);
+    }
+
+    void render()
+    {
+        m_menuRenderer->render(this);
+    }
+
+};
+
+////Set Site ID
+class SiteidMenuItem : public Menu
+{
+    Siteid* m_siteid;
+
+    int m_siteidIndex;
+
+public:
+
+    SiteidMenuItem(String name, String parentName, int siteidIndex, Siteid* siteid, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_siteid(siteid),
+              m_siteidIndex(siteidIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_siteid->selectSiteidByIndex(m_siteidIndex);
+    }
+
+    void render()
+    {
+        m_menuRenderer->render(this);
+    }
+
+};
+////Set Log time
+class LogtimeMenuItem : public Menu
+{
+    Logtime* m_logtime;
+
+    int m_logtimeIndex;
+
+public:
+
+    LogtimeMenuItem(String name, String parentName, int logtimeIndex, Logtime* logtime, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_logtime(logtime),
+              m_logtimeIndex(logtimeIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_logtime->selectLogtimeByIndex(m_logtimeIndex);
     }
 
     void render()
