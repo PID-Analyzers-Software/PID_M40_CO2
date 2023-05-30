@@ -74,7 +74,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "26C 30%RH");
-  m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%").c_str());
+  m_display->drawString(114, 0, String(String(200-(v_b * 0.08333 - 250.0), 0) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
@@ -94,7 +94,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
   m_display->drawString(115, 51, String(menu->getName()));
   if (menu->getName() == "L") {
-    Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
+    Serial.print(("CO2,"+String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg"+",2,L"+"\n").c_str());
   }
   m_display->display();
   delay(100);
