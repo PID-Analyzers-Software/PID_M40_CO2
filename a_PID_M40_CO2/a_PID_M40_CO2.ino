@@ -135,7 +135,7 @@ void setup() {
   display.init();
   display.flipScreenVertically();
   //display.setFont(ArialMT_Plain_16);
-  display.drawXbm(0,0, 128, 60, image_arr);
+  display.drawXbm(0, 0, 128, 60, image_arr);
   display.display();
   delay(2000);
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
@@ -180,9 +180,9 @@ void setup() {
   // Run Menus
   vector<Menu*> runMenus;
 
-  runMenus.push_back(new RunMenuItem(" ", "RUN",0, &g_gasManager, runMenuRenderer));
-  runMenus.push_back(new RunMenuItem("L", "RUN",1, &g_gasManager, runMenuRenderer));
-  runMenus.push_back(new RunMenuItem("P", "RUN",1, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem(" ", "RUN", 0, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("L", "RUN", 1, &g_gasManager, runMenuRenderer));
+  runMenus.push_back(new RunMenuItem("P", "RUN", 1, &g_gasManager, runMenuRenderer));
 
   CompositeMenu* runMenu = new CompositeMenu("RUN", "Main Menu", runMenus);
 
@@ -294,14 +294,29 @@ void setup() {
   CompositeMenu* calgasMenu = new CompositeMenu("CALIBRATION Calgas", "Main Menu", calgasMenus);
 
   // Site ID menu
-    vector<Menu*> siteidMenus;
-    siteidMenus.push_back(new SiteidMenuItem("1", "SiteID", 0, &g_siteid, siteidMenuRenderer));
-    CompositeMenu* siteidMenu = new CompositeMenu("Site ID", "Main Menu", siteidMenus);
+  vector<Menu*> siteidMenus;
+  siteidMenus.push_back(new SiteidMenuItem("0", "SiteID", 0, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("1", "SiteID", 1, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("2", "SiteID", 2, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("3", "SiteID", 3, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("4", "SiteID", 4, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("5", "SiteID", 5, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("6", "SiteID", 6, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("7", "SiteID", 7, &g_siteid, siteidMenuRenderer));
+  siteidMenus.push_back(new SiteidMenuItem("8", "SiteID", 8, &g_siteid, siteidMenuRenderer));
 
-    // Site ID menu
-    vector<Menu*> logtimeMenus;
-    logtimeMenus.push_back(new LogtimeMenuItem("1", "Log Duration", 0, &g_logtime, logtimeMenuRenderer));
-    CompositeMenu* logtimeMenu = new CompositeMenu("Log Duration", "Main Menu", logtimeMenus);
+  CompositeMenu* siteidMenu = new CompositeMenu("Site ID", "Main Menu", siteidMenus);
+
+  // Site ID menu
+  vector<Menu*> logtimeMenus;
+  logtimeMenus.push_back(new LogtimeMenuItem("1 min", "Log Duration", 0, &g_logtime, logtimeMenuRenderer));
+  logtimeMenus.push_back(new LogtimeMenuItem("5 min", "Log Duration", 1, &g_logtime, logtimeMenuRenderer));
+  logtimeMenus.push_back(new LogtimeMenuItem("10 min", "Log Duration", 2, &g_logtime, logtimeMenuRenderer));
+  logtimeMenus.push_back(new LogtimeMenuItem("20 min", "Log Duration", 3, &g_logtime, logtimeMenuRenderer));
+  logtimeMenus.push_back(new LogtimeMenuItem("30 min", "Log Duration", 4, &g_logtime, logtimeMenuRenderer));
+    logtimeMenus.push_back(new LogtimeMenuItem("continous", "Log Duration", 4, &g_logtime, logtimeMenuRenderer));
+
+  CompositeMenu* logtimeMenu = new CompositeMenu("Log Duration", "Main Menu", logtimeMenus);
 
   ////////////////////////////////////
   vector<Menu*> horizontalMenus;

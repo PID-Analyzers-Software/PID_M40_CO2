@@ -70,7 +70,7 @@ public:
             const float multiplier = 0.125F; //GAIN 1
 
             for (int i = 0; i<numReadings; i++) {
-                total = total +analogRead(27)*0.80586;
+                total = total +m_ads1115->readADC_SingleEnded(3) * multiplier;
             }
             m_lastReadValue_battery = total / numReadings;
 

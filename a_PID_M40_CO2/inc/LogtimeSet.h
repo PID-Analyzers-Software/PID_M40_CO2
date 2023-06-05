@@ -8,7 +8,7 @@
 
 class Logtime
 {
-    std::array<int,24> m_Array{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}};
+    std::array<int,6> m_Array{{1,5,10,20,30,999}};
     int m_selectedLogtime = 0;
 
     unsigned long m_startMillis = 0;

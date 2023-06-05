@@ -74,7 +74,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "26C 30%RH");
-  m_display->drawString(114, 0, String(String(200-(v_b * 0.08333 - 250.0), 0) + "%").c_str());
+  m_display->drawString(114, 0, String(String(0.13333*v_b - 460, 0) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
@@ -88,16 +88,17 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(12, 30, "CO2");   //Unit
   m_display->drawString(115, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
-  m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 51,  String(String(v_b) + "mV").c_str());
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm");
   }
   m_display->drawString(115, 51, String(menu->getName()));
   if (menu->getName() == "L") {
-    Serial.print(("CO2,"+String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg"+",2,L"+"\n").c_str());
+    Serial.print(("CO2," + String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg" + ",2,L" + "\n").c_str());
   }
   m_display->display();
   delay(100);
+
 
 }
 
@@ -235,47 +236,47 @@ void SSD1306CalvalueMenuRenderer::render(Menu* menu)
 ///////////////////////////////
 
 SSD1306SiteidMenuRenderer::SSD1306SiteidMenuRenderer(SSD1306Wire* display, Siteid* siteid) : SSD1306MenuRenderer(display),
-                                                                                                     m_siteid(siteid)
+  m_siteid(siteid)
 {
 }
 
 void SSD1306SiteidMenuRenderer::render(Menu* menu)
 {
-    int siteid = m_siteid->getSelectedSiteid();
+  int siteid = m_siteid->getSelectedSiteid();
 
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(64, 0, "Site ID");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_16);
-    m_display->drawString(70, 28 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->display();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(64, 0, "Site ID");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(70, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
 }
 
 ///////////////////////////////
 
 SSD1306LogtimeMenuRenderer::SSD1306LogtimeMenuRenderer(SSD1306Wire* display, Logtime* logtime) : SSD1306MenuRenderer(display),
-                                                                                                     m_logtime(logtime)
+  m_logtime(logtime)
 {
 }
 
 void SSD1306LogtimeMenuRenderer::render(Menu* menu)
 {
-    int logtime = m_logtime->getSelectedLogtime();
+  int logtime = m_logtime->getSelectedLogtime();
 
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(64, 0, "Log Duration");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_16);
-    m_display->drawString(70, 28 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->display();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(64, 0, "Log Duration");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(70, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
 }
 
 ///////////////////////////////
