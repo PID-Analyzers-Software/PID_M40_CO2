@@ -129,6 +129,7 @@ class Keyboard : ButtonPressListener
 	std::function<void()> m_onSPressed;
 	std::function<void()> m_onRightPressed;
     std::function<void()> m_onOnPressed;
+    std::function<void()> m_onFastScroll;
 
 public:
 
@@ -159,8 +160,9 @@ public:
     void addOnOnPressedFctor(const std::function<void()>& f) { m_onOnPressed = f; }
 
     void addOnCalibrationComboPressedFctor(const std::function<void()>& f) { m_onCalibrationComboPressed = f; }
-	
-	void onButtonPressUp(int pinNum, unsigned long pressDuration)
+    void addOnFastScrollFctor(const std::function<void()>& f) { m_onFastScroll = f; }
+
+    void onButtonPressUp(int pinNum, unsigned long pressDuration)
 	{
 		String arr;
 		if(m_buttonDownTotalMillis != 0) arr += "1"; else arr += "0";
@@ -204,6 +206,14 @@ public:
 				m_buttonDownTotalMillis = 0;
 			}
 		}
+        else if(pressDuration > c_BUTTON_FAST_SCROLL_DURATION &&
+                m_buttonRightTotalMillis == 0 &&
+                m_buttonSTotalMillis == 0)  // define c_BUTTON_FAST_SCROLL_DURATION to a suitable value
+        {
+            // Fast scroll action
+            m_onFastScroll();
+            m_buttonDownTotalMillis = 0;
+        }
 		else if(m_buttonRightDetector->getPinNum() == pinNum)
 		{
 			m_buttonRightTotalMillis = pressDuration;

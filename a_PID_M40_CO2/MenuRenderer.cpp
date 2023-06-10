@@ -88,7 +88,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(12, 30, "CO2");   //Unit
   m_display->drawString(115, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
-  m_display->drawString(64, 51,  String(String(v_b) + "mV").c_str());
+  m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm");
   }

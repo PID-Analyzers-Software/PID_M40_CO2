@@ -10,6 +10,7 @@ extern const uint8_t c_BUTTON_RIGHT_PIN;
 extern const uint8_t c_BUTTON_ON_PIN;
 
 extern const uint8_t c_BUTTON_SINGLE_CLICK_HOLD_DURATION;
+extern const uint8_t c_BUTTON_FAST_SCROLL_DURATION;
 extern const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION;
 
 extern const char* c_FLASH_LOG_FREQ_PARAM_NAME;

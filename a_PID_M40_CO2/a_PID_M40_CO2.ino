@@ -314,7 +314,7 @@ void setup() {
   logtimeMenus.push_back(new LogtimeMenuItem("10 min", "Log Duration", 2, &g_logtime, logtimeMenuRenderer));
   logtimeMenus.push_back(new LogtimeMenuItem("20 min", "Log Duration", 3, &g_logtime, logtimeMenuRenderer));
   logtimeMenus.push_back(new LogtimeMenuItem("30 min", "Log Duration", 4, &g_logtime, logtimeMenuRenderer));
-    logtimeMenus.push_back(new LogtimeMenuItem("continous", "Log Duration", 4, &g_logtime, logtimeMenuRenderer));
+  logtimeMenus.push_back(new LogtimeMenuItem("continous", "Log Duration", 4, &g_logtime, logtimeMenuRenderer));
 
   CompositeMenu* logtimeMenu = new CompositeMenu("Log Duration", "Main Menu", logtimeMenus);
 
@@ -388,6 +388,26 @@ void setupButtons()
     g_mainMenu->moveToNext();
 
   });
+  keyboard->addOnFastScrollFctor([] {
+    g_sleepTimer.resetIdleCounter();
+
+    if (CALIBRATION_MODE)
+      return;
+    Serial.println("Downnn Holdddd");
+    g_mainMenu->print();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+
+  });
+
   keyboard->addOnSPressedFctor([] {
 
     g_sleepTimer.resetIdleCounter();
@@ -400,6 +420,7 @@ void setupButtons()
     g_timeSync.initTimeFromRTC();
 
   });
+
   keyboard->addOnRightPressedFctor([] {
 
     g_sleepTimer.resetIdleCounter();
