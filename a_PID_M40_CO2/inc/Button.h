@@ -176,7 +176,7 @@ public:
             if(pressDuration < 5000) {
                 gpio_hold_en(GPIO_NUM_5);
                 gpio_deep_sleep_hold_en();
-
+                digitalWrite(25, LOW);
                 Serial.println("SleepTimer deep_sleep!");
                 Serial.flush();
 

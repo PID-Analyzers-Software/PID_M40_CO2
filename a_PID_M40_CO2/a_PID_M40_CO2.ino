@@ -111,6 +111,7 @@ void setup() {
   // ADC
   ads1115.begin();
   ads1115.setGain(GAIN_ONE);
+  digitalWrite(25, HIGH);
 
   AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115);
 
