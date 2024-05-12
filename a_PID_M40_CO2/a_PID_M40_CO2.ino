@@ -1,4 +1,3 @@
-
 /*
    Release Log
    Save the selected gas index to the EEPROM memory. 3/4/2023
@@ -215,8 +214,8 @@ void setup() {
 
   // Range Menus
   vector<Menu*> rangeMenus;
-  rangeMenus.push_back(new RangeMenuItem("0-2500 ppm", "Range",  0, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("0-5000 ppm", "Range",  1, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("0-5000 ppm", "Range",  0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("0-100ran00 ppm", "Range",  1, &g_range, rangeMenuRenderer));
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
@@ -323,9 +322,9 @@ void setup() {
   vector<Menu*> horizontalMenus;
 
   horizontalMenus.push_back(runMenu);
-  //horizontalMenus.push_back(libraryMenu);
+  horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
-  //horizontalMenus.push_back(rangeMenu);
+  horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);

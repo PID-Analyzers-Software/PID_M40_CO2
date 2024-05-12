@@ -74,21 +74,25 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "26C 30%RH");
-  m_display->drawString(114, 0, String(String(0.13333*v_b - 460, 0) + "%").c_str());
+  m_display->drawString(114, 0, String(String(0.13333 * v_b - 460, 0) + "%").c_str());
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawLine(0, 14, 256, 14);
   m_display->setFont(ArialMT_Plain_24);
+  double readings = m_dataSource->getDoubleValue();
   if (m_dataSource->getDoubleValue() > range) {
     m_display->drawString(60, 18, "xxx");
   } else {
-    m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 1).c_str());
-
+    if (range == 5000) {
+      m_display->drawString(60, 18, String(readings, 1).c_str());
+    } else {
+      m_display->drawString(60, 18, String(readings*2, 1).c_str());
+    }
   }
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 30, "CO2");   //Unit
   m_display->drawString(115, 30, "ppm");   //Unit
   m_display->drawLine(0, 49, 256, 49);
-  m_display->drawString(64, 51,  String(String(v_b) + " bmV").c_str());
+  m_display->drawString(64, 51,  String(String(m_dataSource->getRawMiliVolts()) + " mV").c_str());
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm");
   }
