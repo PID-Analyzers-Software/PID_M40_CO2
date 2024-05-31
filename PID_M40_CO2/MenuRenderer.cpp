@@ -47,70 +47,72 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource*
 
 void SSD1306RunMenuRenderer::render(Menu* menu)
 {
-    const float multiplier = 0.125F; //GAIN 1
-    int range = m_range->getSelectedRange();
-    int alarm = m_alarm->getSelectedAlarm();
-    int calvalue = m_calvalue->getSelectedCalvalue();
-    int64_t startMicros = esp_timer_get_time();
-    int v_b = m_dataSource->getRawMiliVolts_battery();
-    Gas& selectedGas = m_gasManager->getSelectedGas();
+  const float multiplier = 0.125F; //GAIN 1
+  int range = m_range->getSelectedRange();
+  int alarm = m_alarm->getSelectedAlarm();
+  int calvalue = m_calvalue->getSelectedCalvalue();
+  int64_t startMicros = esp_timer_get_time();
+  int v_b = m_dataSource->getRawMiliVolts_battery();
+  Gas& selectedGas = m_gasManager->getSelectedGas();
 
-    static bool displayOn = true;  // Toggle for blinking
-    static unsigned long lastBlinkTime = 0;
-    const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
+  static bool displayOn = true;  // Toggle for blinking
+  static unsigned long lastBlinkTime = 0;
+  const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
 
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_LEFT);
-    m_display->setFont(ArialMT_Plain_10);
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_LEFT);
+  m_display->setFont(ArialMT_Plain_10);
 
-    // Date & Time
-    struct tm timeinfo;
-    getLocalTime(&timeinfo, 10);
-    char dateString[30] = { 0 };
-    char timeString[30] = { 0 };
-    strftime(dateString, 30, "%b %d %y", &timeinfo);
-    strftime(timeString, 30, "%H:%M", &timeinfo);
-    m_display->drawString(0, 0, String(timeString));
+  // Date & Time
+  struct tm timeinfo;
+  getLocalTime(&timeinfo, 10);
+  char dateString[30] = { 0 };
+  char timeString[30] = { 0 };
+  strftime(dateString, 30, "%b %d %y", &timeinfo);
+  strftime(timeString, 30, "%H:%M", &timeinfo);
+  m_display->drawString(0, 0, String(timeString));
 
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->drawString(64, 0, String(selectedGas.getName()));
-    m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
-    m_display->drawLine(0, 14, 256, 14);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->drawString(64, 0, "26C 30%RH");
+  m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
+  m_display->drawLine(0, 14, 256, 14);
 
-    // Check if the reading is above the alarm level
-    bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
+  // Check if the reading is above the alarm level
+  bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
 
-    if (isAboveAlarm && alarm!=0) {
-        unsigned long currentTime = millis();
-        if (currentTime - lastBlinkTime > blinkInterval) {
-            displayOn = !displayOn;  // Toggle the display state
-            lastBlinkTime = currentTime;
-        }
-        if (displayOn) {
-            m_display->setFont(ArialMT_Plain_24);
-            m_display->drawString(60, 18, "ALARM");
-        }
-    } else {
-        m_display->setFont(ArialMT_Plain_24);
-        m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 1));
+  if (isAboveAlarm && alarm != 0) {
+    unsigned long currentTime = millis();
+    if (currentTime - lastBlinkTime > blinkInterval) {
+      displayOn = !displayOn;  // Toggle the display state
+      lastBlinkTime = currentTime;
     }
-
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(115, 30, "ppm");  // Unit
-    m_display->drawLine(0, 49, 256, 49);
-    m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
-    if (alarm != 0) {
-        m_display->drawString(12, 51, "Alm");
+    if (displayOn) {
+      m_display->setFont(ArialMT_Plain_24);
+      m_display->drawString(60, 18, "ALARM");
     }
-    m_display->drawString(115, 51, String(menu->getName()));
+  } else {
+    m_display->setFont(ArialMT_Plain_24);
+    m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 1));
+  }
 
-    if (menu->getName() == "L") {
-        Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
-    }
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(115, 30, "ppm");  // Unit
+  m_display->drawString(15, 30, "CO2");  // Unit
 
-    m_display->display();
-    delay(100);  // Consider adjusting this delay based on your application's requirements
+  m_display->drawLine(0, 49, 256, 49);
+  m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
+  if (alarm != 0) {
+    m_display->drawString(12, 51, "Alm");
+  }
+  m_display->drawString(115, 51, String(menu->getName()));
+
+  if (menu->getName() == "L") {
+    Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
+  }
+
+  m_display->display();
+  delay(100);  // Consider adjusting this delay based on your application's requirements
 }
 
 
