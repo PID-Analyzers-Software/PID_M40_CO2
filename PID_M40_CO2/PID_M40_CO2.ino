@@ -291,7 +291,7 @@ void setup() {
   vector<Menu*> horizontalMenus;
 
   horizontalMenus.push_back(runMenu);
-  //horizontalMenus.push_back(libraryMenu);
+  horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
   horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
