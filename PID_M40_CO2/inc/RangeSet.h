@@ -9,7 +9,7 @@
 
 class Range
 {
-    std::array<int, 12> m_rangeArray{{10, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100}};
+    std::array<int, 2> m_rangeArray{{5000, 10000}};
     int m_selectedRange = 0;
 
     unsigned long m_startMillis = 0;
@@ -54,7 +54,7 @@ public:
             m_selectedRange = index;
             EEPROM.writeInt(72, index);
             EEPROM.commit();
-            Serial.print("Range saved ");
+            Serial.print("Range saved: ");
             Serial.println(index);
         }
 

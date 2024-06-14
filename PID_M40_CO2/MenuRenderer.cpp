@@ -408,10 +408,12 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Zero");
-  m_display->drawLine(10, 16, 256, 16);
-  m_display->drawString(64, 22, "Zero Gas: 0 ppm");
-  m_display->drawString(64, 32, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  m_display->drawString(64, 45, "Press S when Stable");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->drawString(64, 21, "“Place Scrubber on");
+//  m_display->drawString(64, 32, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 33, "end of Probe ");
+
+  m_display->drawString(64, 45, "Press S");
   m_display->display();
 }
 
@@ -428,7 +430,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Cal Gas");
-  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
   m_display->drawString(64, 33, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
@@ -448,7 +450,7 @@ void SSD1306CalResMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Result");
-  m_display->drawLine(10, 16, 256, 16);
+  m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 24, "Calibration Finished");
   m_display->drawString(64, 40, "<DOWN>: Restart");
   m_display->drawString(64, 48, "<UP>: Finish");

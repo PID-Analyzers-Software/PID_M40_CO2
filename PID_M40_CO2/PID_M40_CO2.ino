@@ -100,7 +100,7 @@ void setup() {
   Serial.println("PID M30 v230304");
   // DEEP-SLEEP init
   pinMode(25, OUTPUT);
-  digitalWrite(25, HIGH); 
+  digitalWrite(25, HIGH);
   //esp_sleep_enable_ext1_wakeup(0x8004, ESP_EXT1_WAKEUP_ANY_HIGH);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_12, LOW);
   // ADC
@@ -130,7 +130,7 @@ void setup() {
   display.init();
   display.flipScreenVertically();
   //display.setFont(ArialMT_Plain_16);
-  display.drawXbm(0,0,128,60,image_arr);
+  display.drawXbm(0, 0, 128, 60, image_arr);
   display.display();
   delay(200);
 
@@ -193,19 +193,8 @@ void setup() {
 
   // Range Menus
   vector<Menu*> rangeMenus;
-  rangeMenus.push_back(new RangeMenuItem("10 ppm", "Range", 0, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("100 ppm", "Range", 1, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("200 ppm", "Range", 2, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("300 ppm", "Range", 3, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("400 ppm", "Range", 4, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("500 ppm", "Range", 5, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("600 ppm", "Range", 6, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("700 ppm", "Range", 7, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("800 ppm", "Range", 8, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("900 ppm", "Range", 9, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("1000 ppm", "Range", 10, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("1100 ppm", "Range", 11, &g_range, rangeMenuRenderer));
-
+  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range", 0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range", 1, &g_range, rangeMenuRenderer));
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
@@ -247,13 +236,8 @@ void setup() {
   // calvalue Menus
 
   vector<Menu*> calvalueMenus;
-  calvalueMenus.push_back(new CalvalueMenuItem(String(0.1) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
-
-  for (int i = 1; i <= 100; i++) {
-    int ppm = 0 + i * 10;
-    String label = "Cal Gas";
-    calvalueMenus.push_back(new CalvalueMenuItem(String(ppm) + " ppm", label, i, &g_calvalue, calvalueMenuRenderer));
-  }
+  calvalueMenus.push_back(new CalvalueMenuItem(String(5000) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(10000) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
 
   CompositeMenu* calvalueMenu = new CompositeMenu("Calvalue", "Main Menu" , calvalueMenus);
 
@@ -291,18 +275,20 @@ void setup() {
   vector<Menu*> horizontalMenus;
 
   horizontalMenus.push_back(runMenu);
-  horizontalMenus.push_back(libraryMenu);
   //horizontalMenus.push_back(timerMenu);
+
+
+  horizontalMenus.push_back(calMenu);
+  horizontalMenus.push_back(calvalueMenu);
+  horizontalMenus.push_back(calgasMenu);
+  horizontalMenus.push_back(libraryMenu);
+
   horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
   horizontalMenus.push_back(hourMenu);
   horizontalMenus.push_back(minuteMenu);
-
-  horizontalMenus.push_back(calMenu);
-  horizontalMenus.push_back(calvalueMenu);
-  horizontalMenus.push_back(calgasMenu);
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));
   CompositeMenu* verticalMenu = new CompositeMenu("Main Menu", "", horizontalMenus);

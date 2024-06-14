@@ -486,10 +486,10 @@ public:
         }else if(m_menuName == "Set Minute") {
             m_currentIndex = 0;
         }else if(m_menuName == "Calvalue") {
-            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+            m_currentIndex = (m_currentIndex + 1) % m_menus.size();
         }
 
-        if(m_currentIndex == 6 & m_menuName == "Main Menu"){
+        if(m_currentIndex == 5 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );
