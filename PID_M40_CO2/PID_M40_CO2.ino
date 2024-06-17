@@ -363,7 +363,7 @@ void setupButtons()
   keyboard->addOnCalibrationComboPressedFctor([] {
 
     g_sleepTimer.resetIdleCounter();
-    g_mainMenu->setCurrentMenu(6);
+    g_mainMenu->setCurrentMenu(5);
     Serial.println("PRESS CALIBRATION");
     return;
   });
