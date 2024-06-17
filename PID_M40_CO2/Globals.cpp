@@ -8,7 +8,7 @@ const uint8_t c_BUTTON_RIGHT_PIN = 13;
 const uint8_t c_BUTTON_ON_PIN = 12;
 
 const uint8_t c_BUTTON_SINGLE_CLICK_HOLD_DURATION = 150;
-const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION = 3000;
+const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION = 2000;
 
 const char* c_FLASH_LOG_FREQ_PARAM_NAME = "flashLogFreq";
 const char* c_WIFI_RT_LOG_FREQ_PARAM_NAME = "wifiRtLogFreq";
