@@ -16,6 +16,7 @@ class Alarm;
 class Calvalue;
 class Hour;
 class Minute;
+class Outport;
 
 
 class MenuRenderer
@@ -129,6 +130,18 @@ class SSD1306CalvalueMenuRenderer : public SSD1306MenuRenderer
 public:
 
     SSD1306CalvalueMenuRenderer(SSD1306Wire* display, Calvalue* calvalue);
+
+    void render(Menu* menu);
+};
+
+
+class SSD1306OutportMenuRenderer : public SSD1306MenuRenderer
+{
+    Outport* m_outport;
+
+public:
+
+    SSD1306OutportMenuRenderer(SSD1306Wire* display, Outport* outport);
 
     void render(Menu* menu);
 };

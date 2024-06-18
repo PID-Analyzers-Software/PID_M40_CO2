@@ -9,6 +9,8 @@
 #include "MinuteSet.h"
 
 #include "CalvalueSet.h"
+#include "OutputSet.h"
+
 #include "DataLogger.h"
 #include "TimeSync.h"
 #include "DataSource.h"
@@ -235,6 +237,29 @@ public:
 };
 
 
+class OutportMenuItem : public Menu
+{
+    Outport* m_outport  ;
+
+    int m_outportIndex;
+
+public:
+
+    OutportMenuItem(String name, String parentName, int outportIndex, Outport* outport, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_outport(outport),
+              m_outportIndex(outportIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_outport->selectOutportByIndex(m_outportIndex);
+    }
+
+};
+
 
 class DataLoggerFlashStoreMenuItem : public Menu
 {
@@ -448,6 +473,11 @@ public:
         return m_menus[ m_currentIndex ];
     }
 
+    int getCurrentIndex() // Added method to get the current index
+    {
+        return m_currentIndex;
+    }
+
     void moveToNext()
     {
         m_currentIndex = (m_currentIndex + 1) % m_menus.size();
@@ -475,6 +505,19 @@ public:
         Serial.println(m_currentIndex);
         Serial.println(m_menuName);
         m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        if(m_menuName == "LIBRARY") {
+            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+        }else if(m_menuName == "Alarm"){
+            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+        }else if(m_menuName == "Range") {
+            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+        }else if(m_menuName == "Set Hour") {
+            m_currentIndex = 0;
+        }else if(m_menuName == "Set Minute") {
+            m_currentIndex = 0;
+        }else if(m_menuName == "Calvalue") {
+            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+        }
 
         if(m_currentIndex == 4 & m_menuName == "Main Menu"){
             m_currentIndex = 0;

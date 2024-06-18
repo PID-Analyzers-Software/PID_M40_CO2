@@ -31,6 +31,7 @@
 #include "inc/MinuteSet.h"
 
 #include "inc/CalvalueSet.h"
+#include "inc/OutputSet.h"
 #include "inc/Globals.h"
 #include "inc/DataLogger.h"
 #include "inc/DataSource.h"
@@ -68,7 +69,7 @@ Alarm g_alarm;
 Hour g_hour;
 Minute g_minute;
 Calvalue g_calvalue;
-
+Outport g_outport;
 DataLogger g_dataLogger;
 
 TimeSync g_timeSync;
@@ -142,6 +143,7 @@ void setup() {
   MenuRenderer* hourMenuRenderer = new SSD1306HourMenuRenderer(&display, &g_hour);
   MenuRenderer* minuteMenuRenderer = new SSD1306MinuteMenuRenderer(&display, &g_minute);
   MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
+  MenuRenderer* outportMenuRenderer = new SSD1306OutportMenuRenderer(&display, &g_outport);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
   MenuRenderer* wifiDumpMenuRenderer = new SSD1306WiFiDumpMenuRenderer(&display, &g_dataLogger);
@@ -237,10 +239,18 @@ void setup() {
 
   vector<Menu*> calvalueMenus;
   calvalueMenus.push_back(new CalvalueMenuItem(String(5000) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(10000) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(10000) + " ppm", "Cal Gas", 1, &g_calvalue, calvalueMenuRenderer));
 
   CompositeMenu* calvalueMenu = new CompositeMenu("Calvalue", "Main Menu" , calvalueMenus);
 
+
+  // outport menus
+    vector<Menu*> outportMenus;
+    outportMenus.push_back(new OutportMenuItem("RS232", " Gas", 0, &g_outport, outportMenuRenderer));
+    outportMenus.push_back(new OutportMenuItem("USB", " Gas", 1, &g_outport, outportMenuRenderer));
+    outportMenus.push_back(new OutportMenuItem("BT", " Gas", 2, &g_outport, outportMenuRenderer));
+
+    CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
 
@@ -287,8 +297,11 @@ void setup() {
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
-  horizontalMenus.push_back(hourMenu);
+    horizontalMenus.push_back(outportMenu);
+
+    horizontalMenus.push_back(hourMenu);
   horizontalMenus.push_back(minuteMenu);
+
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));
   CompositeMenu* verticalMenu = new CompositeMenu("Main Menu", "", horizontalMenus);
@@ -354,10 +367,14 @@ void setupButtons()
   keyboard->addOnRightPressedFctor([] {
 
     g_sleepTimer.resetIdleCounter();
-
-
     Serial.println("PRESS RIGHT");
-    ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+
+    if (g_mainMenu->getCurrentIndex() == 0) {
+      g_mainMenu->setCurrentMenu(5);
+    } else{
+      ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
+      }
+
   });
 
   keyboard->addOnCalibrationComboPressedFctor([] {

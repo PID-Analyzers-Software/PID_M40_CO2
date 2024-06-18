@@ -7,7 +7,7 @@
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
 #include "inc/CalvalueSet.h"
-
+#include "inc/OutputSet.h"
 #include <Adafruit_ADS1015.h>
 #include "SSD1306.h"
 #include <Arduino.h>
@@ -98,7 +98,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 30, "ppm");  // Unit
-  m_display->drawString(15, 30, "CO2");  // Unit
+  //m_display->drawString(15, 30, "CO2");  // Unit
 
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
@@ -248,6 +248,28 @@ void SSD1306CalvalueMenuRenderer::render(Menu* menu)
 }
 
 ///////////////////////////////
+
+
+SSD1306OutportMenuRenderer::SSD1306OutportMenuRenderer(SSD1306Wire* display, Outport* outport) : SSD1306MenuRenderer(display),
+  m_outport(outport)
+{
+}
+void SSD1306OutportMenuRenderer::render(Menu* menu)
+{
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(64, 0, "Out Port");
+    m_display->drawLine(0, 16, 256, 16);
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(70, 28 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->display();
+}
+
+
+
 
 SSD1306FlashLoggerMenuRenderer::SSD1306FlashLoggerMenuRenderer(SSD1306Wire* display, DataLogger* dataLogger) : SSD1306MenuRenderer(display),
   m_dataLogger(dataLogger)
