@@ -106,7 +106,7 @@ void setup() {
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_12, LOW);
   // ADC
   ads1115.begin();
-  ads1115.setGain(GAIN_ONE);
+  ads1115.setGain(GAIN_TWOTHIRDS);
 
   AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115);
 
