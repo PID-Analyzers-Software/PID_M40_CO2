@@ -98,10 +98,10 @@ void IRAM_ATTR dummyTouchISR() {}
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("PID M30 v230304");
+  Serial.println("PID M40 v20240622");
   // DEEP-SLEEP init
-  pinMode(25, OUTPUT);
-  digitalWrite(25, HIGH);
+  pinMode(26, OUTPUT);
+  digitalWrite(26, HIGH);
   //esp_sleep_enable_ext1_wakeup(0x8004, ESP_EXT1_WAKEUP_ANY_HIGH);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_12, LOW);
   // ADC

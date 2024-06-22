@@ -176,7 +176,7 @@ public:
                 gpio_deep_sleep_hold_en();
 
                 Serial.println("SleepTimer deep_sleep!");
-                digitalWrite(25, LOW);
+                digitalWrite(26, LOW);
                 Serial.flush();
 
                 Wire.beginTransmission(0x3C);
