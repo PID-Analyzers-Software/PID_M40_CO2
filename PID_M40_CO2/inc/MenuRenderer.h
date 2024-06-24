@@ -59,10 +59,11 @@ class SSD1306RunMenuRenderer : public SSD1306MenuRenderer
     Range*              m_range;
     Alarm*              m_alarm;
     Calvalue*           m_calvalue;
+    Outport*              m_outport;
 	
 public:
 
-	SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager,Alarm* alarm, Range* range, Calvalue* calvalue);
+	SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager,Alarm* alarm, Range* range, Calvalue* calvalue, Outport* outport);
 
 	void render(Menu* menu);
 };

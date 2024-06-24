@@ -33,12 +33,13 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Range* range, Calvalue* calvalue) : SSD1306MenuRenderer(display),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Range* range, Calvalue* calvalue, Outport* outport) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
   m_gasManager(gasManager),
   m_alarm(alarm),
   m_range(range),
-  m_calvalue(calvalue)
+  m_calvalue(calvalue),
+  m_outport(outport)
 {
 
 }
@@ -50,6 +51,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   const float multiplier = 0.125F; //GAIN 1
   int range = m_range->getSelectedRange();
   int alarm = m_alarm->getSelectedAlarm();
+  int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
   int v_b = m_dataSource->getRawMiliVolts_battery();
@@ -74,7 +76,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawString(0, 0, String(timeString));
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "26C  30%");
+  //m_display->drawString(64, 0, "26C  30%");
+  m_display->drawString(64, 0, "CO2");
+
   m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
   m_display->drawLine(0, 14, 256, 14);
 
@@ -107,9 +111,12 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
   m_display->drawString(115, 51, String(menu->getName()));
 
-  if (menu->getName() == "L") {
+ 
+  if (outport == 1) {
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
+    m_display->drawString(112, 51, "USB");
   }
+  Serial.println(outport);
 
   m_display->display();
   delay(100);  // Consider adjusting this delay based on your application's requirements
@@ -256,16 +263,16 @@ SSD1306OutportMenuRenderer::SSD1306OutportMenuRenderer(SSD1306Wire* display, Out
 }
 void SSD1306OutportMenuRenderer::render(Menu* menu)
 {
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(64, 0, "Out Port");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_16);
-    m_display->drawString(70, 28 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->display();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(64, 0, "Out Port");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(70, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
 }
 
 
@@ -431,11 +438,10 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
-  m_display->drawString(64, 21, "“Place Scrubber on");
-//  m_display->drawString(64, 32, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
-  m_display->drawString(64, 33, "end of Probe ");
+  m_display->drawString(64, 21, "“Place Scrubber on Probe");
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
 
-  m_display->drawString(64, 45, "Press S");
+  m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
 }
 
@@ -454,7 +460,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 33, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();
