@@ -116,7 +116,6 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
     m_display->drawString(112, 51, "USB");
   }
-  Serial.println(outport);
 
   m_display->display();
   delay(100);  // Consider adjusting this delay based on your application's requirements

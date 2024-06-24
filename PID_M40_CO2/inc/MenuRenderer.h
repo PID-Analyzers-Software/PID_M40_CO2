@@ -59,7 +59,7 @@ class SSD1306RunMenuRenderer : public SSD1306MenuRenderer
     Range*              m_range;
     Alarm*              m_alarm;
     Calvalue*           m_calvalue;
-    Outport*              m_outport;
+    Outport*            m_outport;
 	
 public:
 

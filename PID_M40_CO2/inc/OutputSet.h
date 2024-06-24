@@ -15,7 +15,6 @@ class Outport
     unsigned long m_startMillis = 0;
 
     ConfigurationManager* m_configurationManager;
-    //U8G2_SSD1327_MIDAS_128X128_F_4W_HW_SPI* m_u8g2;
     U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* m_u8g2;
     SSD1306* m_display;
 
@@ -52,7 +51,9 @@ public:
         if(index >= 0 && index < m_outportArray.size())
         {
             m_selectedOutport = index;
-
+            EEPROM.writeInt(88, index);
+            EEPROM.commit();
+            Serial.print("Outport saved: ");
             Serial.println(index);
         }
 
@@ -90,7 +91,7 @@ public:
     }
 
     int getSelectedOutport() {
-        int outport = 0;
+        int outport = EEPROM.read(88);
         return m_outportArray[outport];
     }
 
