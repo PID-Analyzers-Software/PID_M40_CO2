@@ -170,25 +170,7 @@ public:
 
         Serial.println("Press duration for pinNum:" + String(pinNum) + " duration: " + String(pressDuration) + " " + arr);
 
-        if(pinNum == 12 && pressDuration > 200){
-            if(pressDuration < 5000) {
-                gpio_hold_en(GPIO_NUM_5);
-                gpio_deep_sleep_hold_en();
 
-                Serial.println("SleepTimer deep_sleep!");
-                digitalWrite(26, LOW);
-                Serial.flush();
-
-                Wire.beginTransmission(0x3C);
-                Wire.write(0x80);
-                Wire.write(SSD1306_DISPLAYOFF);
-                Wire.endTransmission(); //           m_display -> display();
-
-                delay(1000);
-                esp_deep_sleep_start();
-                return;
-            }
-        }
 
 
 		if(m_buttonDownDetector->getPinNum() == pinNum)
@@ -236,8 +218,23 @@ public:
 			m_buttonSTotalMillis = 0;
 			return;
 		}
+        else if(m_buttonOnDetector->getPinNum() == pinNum)
+        {
+            m_buttonOnTotalMillis = pressDuration;
 
-		Serial.println("D" + String(m_buttonDownTotalMillis) + " S: " + String(m_buttonSTotalMillis) + " R: " + String(m_buttonRightTotalMillis));
+            if(
+                    pressDuration > c_BUTTON_SINGLE_CLICK_HOLD_DURATION &&
+                    pressDuration < c_BUTTON_SINGLE_CLICK_HOLD_DURATION + 200
+                    )
+            {
+                m_onOnPressed();
+            }
+
+            m_buttonOnTotalMillis = 0;
+            return;
+        }
+
+		Serial.println("D:" + String(m_buttonDownTotalMillis) + " S: " + String(m_buttonSTotalMillis) + " R: " + String(m_buttonRightTotalMillis));
 
 
 		if( m_buttonDownTotalMillis !=0 && m_buttonSTotalMillis == 0)
@@ -247,7 +244,7 @@ public:
 				m_onCalibrationComboPressed();
                 Serial.println("Calibration combo pressed");
 			}
-			
+
 			m_buttonDownTotalMillis = 0;
 			m_buttonRightTotalMillis = 0;
 			return;

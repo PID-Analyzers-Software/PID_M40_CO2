@@ -13,6 +13,8 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 
+
+
 SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display)
 
 {
@@ -56,7 +58,16 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   int64_t startMicros = esp_timer_get_time();
   int v_b = m_dataSource->getRawMiliVolts_battery();
   Gas& selectedGas = m_gasManager->getSelectedGas();
-
+static const unsigned char battery_bits[] = {
+  0xFE, 0x7F,  // ####### #######
+  0x01, 0x80,  // #             #
+  0xFD, 0xBF,  // # ####### #####
+  0xFD, 0xBF,  // # ####### #####
+  0xFD, 0xBF,  // # ####### #####
+  0xFD, 0xBF,  // # ####### #####
+  0x01, 0x80,  // #             #
+  0xFE, 0x7F   // ####### #######
+};
   static bool displayOn = true;  // Toggle for blinking
   static unsigned long lastBlinkTime = 0;
   const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
@@ -74,12 +85,13 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
+  m_display->drawXbm(110 , 2, 16, 8, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   //m_display->drawString(64, 0, "26C  30%");
   m_display->drawString(64, 0, "CO2");
 
-  m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
+  //m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
   m_display->drawLine(0, 14, 256, 14);
 
   // Check if the reading is above the alarm level
@@ -111,7 +123,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
   m_display->drawString(115, 51, String(menu->getName()));
 
- 
+
   if (outport == 1) {
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
     m_display->drawString(112, 51, "USB");

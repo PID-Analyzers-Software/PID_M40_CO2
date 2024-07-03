@@ -245,12 +245,12 @@ void setup() {
 
 
   // outport menus
-    vector<Menu*> outportMenus;
-    outportMenus.push_back(new OutportMenuItem("RS232", " Gas", 0, &g_outport, outportMenuRenderer));
-    outportMenus.push_back(new OutportMenuItem("USB", " Gas", 1, &g_outport, outportMenuRenderer));
-    outportMenus.push_back(new OutportMenuItem("BT", " Gas", 2, &g_outport, outportMenuRenderer));
+  vector<Menu*> outportMenus;
+  outportMenus.push_back(new OutportMenuItem("RS232", " Gas", 0, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("USB", " Gas", 1, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("BT", " Gas", 2, &g_outport, outportMenuRenderer));
 
-    CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
+  CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
 
@@ -293,14 +293,14 @@ void setup() {
   horizontalMenus.push_back(calgasMenu);
   horizontalMenus.push_back(libraryMenu);
 
-  horizontalMenus.push_back(rangeMenu);
   //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
-    horizontalMenus.push_back(outportMenu);
+  horizontalMenus.push_back(outportMenu);
 
-    horizontalMenus.push_back(hourMenu);
+  horizontalMenus.push_back(hourMenu);
   horizontalMenus.push_back(minuteMenu);
+  horizontalMenus.push_back(rangeMenu);
 
 
   Serial.println("horizontal menu " + String(horizontalMenus.size()));
@@ -373,15 +373,38 @@ void setupButtons()
       g_mainMenu->setCurrentMenu(5);
     } else{
       ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
-      }
+    }
+
+  });
+  keyboard->addOnOnPressedFctor([] {
+
+    g_sleepTimer.resetIdleCounter();
+    Serial.println("PRESS Mode");
+
+    if (g_mainMenu->getCurrentIndex() == 0) {
+      g_mainMenu->setCurrentMenu(9);
+    } else if (g_mainMenu->getCurrentIndex() == 9) {
+      g_mainMenu->setCurrentMenu(0);
+    }
 
   });
 
   keyboard->addOnCalibrationComboPressedFctor([] {
 
-    g_sleepTimer.resetIdleCounter();
-    g_mainMenu->setCurrentMenu(5);
-    Serial.println("PRESS CALIBRATION");
+    gpio_hold_en(GPIO_NUM_5);
+    gpio_deep_sleep_hold_en();
+
+    Serial.println("SleepTimer deep_sleep!");
+    digitalWrite(26, LOW);
+    Serial.flush();
+
+    Wire.beginTransmission(0x3C);
+    Wire.write(0x80);
+    Wire.write(SSD1306_DISPLAYOFF);
+    Wire.endTransmission(); //           m_display -> display();
+
+    delay(1000);
+    esp_deep_sleep_start();
     return;
   });
 
