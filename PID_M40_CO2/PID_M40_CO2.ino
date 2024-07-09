@@ -271,14 +271,14 @@ void setup() {
   vector<Menu*> outportMenus;
   outportMenus.push_back(new OutportMenuItem("Off", " Gas", 0, &g_outport, outportMenuRenderer));
 
-  outportMenus.push_back(new OutportMenuItem("RS232:P", " Gas", 1, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("RS232:L", " Gas", 2, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("RS232-P", " Gas", 1, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("RS232-L", " Gas", 2, &g_outport, outportMenuRenderer));
 
-  outportMenus.push_back(new OutportMenuItem("USB:P", " Gas", 3, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("USB:L", " Gas", 4, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("USB-P", " Gas", 3, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("USB-L", " Gas", 4, &g_outport, outportMenuRenderer));
 
-  outportMenus.push_back(new OutportMenuItem("BT:P", " Gas", 5, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("BT:L", " Gas", 6, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("BT-P", " Gas", 5, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("BT-L", " Gas", 6, &g_outport, outportMenuRenderer));
 
 
   CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);

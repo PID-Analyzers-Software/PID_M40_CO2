@@ -180,7 +180,7 @@ void SSD1306RangeMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Range");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(70, 24 , menu->getName());
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
@@ -208,7 +208,7 @@ void SSD1306AlarmMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Alarm : High");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(60, 24 , menu->getName());
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
@@ -234,7 +234,7 @@ void SSD1306LowalarmMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Alarm : Low");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(60, 24 , menu->getName());
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
@@ -260,7 +260,7 @@ void SSD1306HourMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Time : Hour");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(60, 20 , menu->getName());
     m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
@@ -286,7 +286,7 @@ void SSD1306MinuteMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Time : Minute");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(60, 20 , menu->getName());
     m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
@@ -336,7 +336,7 @@ void SSD1306OutportMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Data Logging");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 22 , menu->getName());
+  m_display->drawString(60, 24 , menu->getName());
     m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
