@@ -228,27 +228,20 @@ public:
                     )
             {
                 m_onOnPressed();
+            }else if(m_buttonOnTotalMillis > c_BUTTON_COMBO_CLICK_HOLD_DURATION && m_buttonOnTotalMillis < c_BUTTON_COMBO_CLICK_HOLD_DURATION + 2000)
+            {
+                m_onCalibrationComboPressed();
+                Serial.println("Calibration combo pressed");
             }
 
             m_buttonOnTotalMillis = 0;
             return;
         }
 
-		Serial.println("D:" + String(m_buttonDownTotalMillis) + " S: " + String(m_buttonSTotalMillis) + " R: " + String(m_buttonRightTotalMillis));
 
 
-		if( m_buttonDownTotalMillis !=0 && m_buttonSTotalMillis == 0)
-		{
-			if(m_buttonDownTotalMillis > c_BUTTON_COMBO_CLICK_HOLD_DURATION)
-			{				
-				m_onCalibrationComboPressed();
-                Serial.println("Calibration combo pressed");
-			}
 
-			m_buttonDownTotalMillis = 0;
-			m_buttonRightTotalMillis = 0;
-			return;
-		}
+        Serial.println("D:" + String(m_buttonDownTotalMillis) + " S: " + String(m_buttonSTotalMillis) + " R: " + String(m_buttonRightTotalMillis)+ " O: " + String(m_buttonOnTotalMillis));
 
 	}
 	
@@ -257,12 +250,18 @@ public:
 		Serial.println("Press down for pinNum:" + String(pinNum));
 		if(m_buttonDownDetector->getPinNum() == pinNum)
 			m_buttonDownTotalMillis = 0;
-		if(m_buttonRightDetector->getPinNum() == pinNum)
+        m_buttonRightTotalMillis = 0;
+
+        if(m_buttonRightDetector->getPinNum() == pinNum)
 			m_buttonRightTotalMillis = 0;
 		if(m_buttonSDetector->getPinNum() == pinNum)
 			m_buttonSTotalMillis = 0;
         if(m_buttonOnDetector->getPinNum() == pinNum)
             m_buttonOnTotalMillis = 0;
-	}
+        m_buttonRightTotalMillis = 0;
+        m_buttonDownTotalMillis = 0;
+
+
+    }
 	
 };

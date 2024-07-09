@@ -18,8 +18,8 @@ public:
 class ConfigurationManager : public ParamChangeListener
 {
 
-    const uint16_t EEPROM_SIZE = sizeof(int) * (1 + 1 + 3) + // Timer, Selected Gas Index, Range, Alarm, Calibration
-                                 sizeof(double) * 8 + // Gas calibration parameters (intercept + slope for 4 gases)
+    const uint16_t EEPROM_SIZE = sizeof(int) * 7 + // Timer, Selected Gas Index, Range, Alarm, Calibration
+                                 sizeof(double) * 10 + // Gas calibration parameters (intercept + slope for 4 gases)
                                  64 + // Device ID
                                  32 * 2; // Wi-Fi SSID and Password
 	
@@ -51,6 +51,7 @@ class ConfigurationManager : public ParamChangeListener
     const uint8_t EEPROM_RANGE_OFFSET = 72;	//uint16_t
     const uint8_t EEPROM_Calvalue_OFFSET = 80;	//uint16_t
     const uint8_t EEPROM_ALARM_OFFSET = 76;	//uint16_t
+    const uint8_t EEPROM_LOWALARM_OFFSET = 92;	//uint16_t
 
 
     const uint8_t EEPROM_GAS_AIR_TC_OFFSET = 999;
@@ -85,6 +86,7 @@ public:
 
     void saveRangeToEEPROM(int range, bool doCommit = true);
     void saveAlarmToEEPROM(int alarm, bool doCommit = true);
+    void saveLowalarmToEEPROM(int lowalarm, bool doCommit = true);
 
     void saveCalvalueToEEPROM(int calvalue, bool doCommit = true);
 

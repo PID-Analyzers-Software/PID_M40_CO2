@@ -8,7 +8,7 @@ const uint8_t c_BUTTON_RIGHT_PIN = 13;
 const uint8_t c_BUTTON_ON_PIN = 12;
 
 const uint8_t c_BUTTON_SINGLE_CLICK_HOLD_DURATION = 131;
-const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION = 2000;
+const uint16_t c_BUTTON_COMBO_CLICK_HOLD_DURATION = 1750;
 
 const char* c_FLASH_LOG_FREQ_PARAM_NAME = "flashLogFreq";
 const char* c_WIFI_RT_LOG_FREQ_PARAM_NAME = "wifiRtLogFreq";
@@ -19,6 +19,7 @@ const char* c_MQTT_SERVER_URL_PARAM_NAME = "mqttServerUrl";
 const char* c_GASINDEX_PARAM_NAME = "GASINDEX";
 const char* c_RANGE_PARAM_NAME = "RANGE";
 const char* c_ALARM_PARAM_NAME = "ALARM";
+const char* c_LOWALARM_PARAM_NAME = "LOWALARM";
 
 const char* c_INTERCEPT_PARAM_NAME = "INTERCEPT";
 const char* c_SLOPE_PARAM_NAME = "SLOPE";

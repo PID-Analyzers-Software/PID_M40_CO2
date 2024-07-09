@@ -4,6 +4,8 @@
 #include "inc/DataSource.h"
 #include "inc/RangeSet.h"
 #include "inc/AlarmSet.h"
+#include "inc/LowAlarmSet.h"
+
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
 #include "inc/CalvalueSet.h"
@@ -35,10 +37,11 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 
 
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Range* range, Calvalue* calvalue, Outport* outport) : SSD1306MenuRenderer(display),
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Lowalarm* lowalarm, Range* range, Calvalue* calvalue, Outport* outport) : SSD1306MenuRenderer(display),
   m_dataSource(dataSource),
   m_gasManager(gasManager),
   m_alarm(alarm),
+  m_lowalarm(lowalarm),
   m_range(range),
   m_calvalue(calvalue),
   m_outport(outport)
@@ -53,21 +56,22 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   const float multiplier = 0.125F; //GAIN 1
   int range = m_range->getSelectedRange();
   int alarm = m_alarm->getSelectedAlarm();
+  int lowalarm = m_lowalarm->getSelectedLowalarm();
   int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
   int v_b = m_dataSource->getRawMiliVolts_battery();
   Gas& selectedGas = m_gasManager->getSelectedGas();
-static const unsigned char battery_bits[] = {
-  0xFE, 0x7F,  // ####### #######
-  0x01, 0x80,  // #             #
-  0xFD, 0xBF,  // # ####### #####
-  0xFD, 0xBF,  // # ####### #####
-  0xFD, 0xBF,  // # ####### #####
-  0xFD, 0xBF,  // # ####### #####
-  0x01, 0x80,  // #             #
-  0xFE, 0x7F   // ####### #######
-};
+  static const unsigned char battery_bits[] = {
+    0xFE, 0x7F,  // ####### #######
+    0x01, 0x80,  // #             #
+    0xFD, 0xBF,  // # ####### #####
+    0xFD, 0xBF,  // # ####### #####
+    0xFD, 0xBF,  // # ####### #####
+    0xFD, 0xBF,  // # ####### #####
+    0x01, 0x80,  // #             #
+    0xFE, 0x7F   // ####### #######
+  };
   static bool displayOn = true;  // Toggle for blinking
   static unsigned long lastBlinkTime = 0;
   const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
@@ -88,8 +92,8 @@ static const unsigned char battery_bits[] = {
   m_display->drawXbm(110 , 2, 16, 8, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  //m_display->drawString(64, 0, "26C  30%");
-  m_display->drawString(64, 0, "CO2");
+  m_display->drawString(64, 0, "26C  30%");
+  //m_display->drawString(64, 0, "CO2");
 
   //m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
   m_display->drawLine(0, 14, 256, 14);
@@ -114,15 +118,19 @@ static const unsigned char battery_bits[] = {
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 30, "ppm");  // Unit
-  //m_display->drawString(15, 30, "CO2");  // Unit
+  m_display->drawString(15, 30, "CO2");  // Unit
 
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm");
   }
-  m_display->drawString(115, 51, String(menu->getName()));
-
+//  m_display->drawString(115, 51, String(menu->getName()));
+//  if (range == 10000) {
+//    m_display->drawString(20, 51, "R10000");
+//  } else if(range == 5000) {
+//    m_display->drawString(20, 51, "R5000");
+//  }
 
   if (outport == 1) {
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
@@ -192,6 +200,27 @@ void SSD1306AlarmMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Alarm");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(70, 28 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->display();
+}
+
+///////////////////////////
+
+SSD1306LowalarmMenuRenderer::SSD1306LowalarmMenuRenderer(SSD1306Wire* display, Lowalarm* lowalarm) : SSD1306MenuRenderer(display),
+  m_lowalarm(lowalarm)
+{
+}
+
+void SSD1306LowalarmMenuRenderer::render(Menu* menu)
+{
+  int lowalarm = m_lowalarm->getSelectedLowalarm();
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->drawString(64, 0, "Low Alarm");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
   m_display->drawString(70, 28 , menu->getName());

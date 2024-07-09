@@ -5,6 +5,8 @@
 #include "SleepTimer.h"
 #include "RangeSet.h"
 #include "AlarmSet.h"
+#include "LowAlarmSet.h"
+
 #include "HourSet.h"
 #include "MinuteSet.h"
 
@@ -163,6 +165,28 @@ public:
     void action()
     {
         m_alarm->selectAlarmByIndex(m_alarmIndex);
+    }
+};
+
+class LowalarmMenuItem : public Menu
+{
+    Lowalarm* m_lowalarm;
+
+    int m_lowalarmIndex;
+
+public:
+
+    LowalarmMenuItem(String name, String parentName, int lowalarmIndex, Lowalarm* lowalarm, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_lowalarm(lowalarm),
+              m_lowalarmIndex(lowalarmIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_lowalarm->selectLowalarmByIndex(m_lowalarmIndex);
     }
 };
 
@@ -484,10 +508,13 @@ public:
         if(m_currentIndex == 4 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
-        if(m_currentIndex == 8 & m_menuName == "Main Menu"){
-            m_currentIndex = 9;
+        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
+            m_currentIndex = 11;
         }
-        if(m_currentIndex == 9 & m_menuName == "Main Menu"){
+        if(m_currentIndex == 6 & m_menuName == "Main Menu"){
+            m_currentIndex = 7;
+        }
+        if(m_currentIndex == 11 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
         Serial.println(m_parentMenuName);
@@ -510,10 +537,14 @@ public:
         m_menus[m_currentIndex]->action();
         Serial.println(m_currentIndex);
         Serial.println(m_menuName);
-        m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        if(m_currentIndex != 0) {
+            m_currentIndex = (m_currentIndex + 1) % m_menus.size();
+        }
         if(m_menuName == "LIBRARY") {
             m_currentIndex = (m_currentIndex - 1) % m_menus.size();
         }else if(m_menuName == "Alarm"){
+            m_currentIndex = (m_currentIndex - 1) % m_menus.size();
+        }else if(m_menuName == "Low Alarm"){
             m_currentIndex = (m_currentIndex - 1) % m_menus.size();
         }else if(m_menuName == "Range") {
             m_currentIndex = (m_currentIndex - 1) % m_menus.size();

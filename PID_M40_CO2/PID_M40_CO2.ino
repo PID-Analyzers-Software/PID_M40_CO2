@@ -27,6 +27,8 @@
 #include "inc/SleepTimer.h"
 #include "inc/RangeSet.h"
 #include "inc/AlarmSet.h"
+#include "inc/LowAlarmSet.h"
+
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
 
@@ -36,6 +38,7 @@
 #include "inc/DataLogger.h"
 #include "inc/DataSource.h"
 #include "inc/image.h"
+
 
 
 using namespace std;
@@ -66,6 +69,7 @@ SleepTimer g_sleepTimer;
 
 Range g_range;
 Alarm g_alarm;
+Lowalarm g_lowalarm;
 Hour g_hour;
 Minute g_minute;
 Calvalue g_calvalue;
@@ -136,10 +140,12 @@ void setup() {
   delay(200);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_alarm, &g_range, &g_calvalue, &g_outport);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_alarm,&g_lowalarm, &g_range, &g_calvalue, &g_outport);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
   MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
+  MenuRenderer* lowalarmMenuRenderer = new SSD1306LowalarmMenuRenderer(&display, &g_lowalarm);
+
   MenuRenderer* hourMenuRenderer = new SSD1306HourMenuRenderer(&display, &g_hour);
   MenuRenderer* minuteMenuRenderer = new SSD1306MinuteMenuRenderer(&display, &g_minute);
   MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
@@ -215,6 +221,22 @@ void setup() {
 
   CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
 
+
+  // Low Alarm Menus
+  vector<Menu*> lowalarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "Low Alarm";
+    if (ppm == 475) {
+      lowalarmMenus.push_back(new LowalarmMenuItem("Off", label, i, &g_lowalarm, lowalarmMenuRenderer));
+    } else {
+      lowalarmMenus.push_back(new LowalarmMenuItem(String(ppm) + " ppm", label, i, &g_lowalarm, lowalarmMenuRenderer));
+    }
+  }
+
+  CompositeMenu* lowalarmMenu = new CompositeMenu("Low Alarm", "Main Menu" , lowalarmMenus);
+
+
   // Hour Menus
   vector<Menu*> minuteMenus;
   for (int i = 0; i <= 59; i++) {
@@ -233,6 +255,7 @@ void setup() {
   }
 
   CompositeMenu* hourMenu = new CompositeMenu("Set Hour", "Main Menu" , hourMenus);
+
 
 
   // calvalue Menus
@@ -293,9 +316,11 @@ void setup() {
   horizontalMenus.push_back(calgasMenu);
   horizontalMenus.push_back(libraryMenu);
 
-  //horizontalMenus.push_back(dataLoggerMenu);
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
+    horizontalMenus.push_back(lowalarmMenu);
+  horizontalMenus.push_back(dataLoggerMenu);
+
   horizontalMenus.push_back(outportMenu);
 
   horizontalMenus.push_back(hourMenu);
@@ -336,6 +361,8 @@ void setup() {
   g_range.selectRangeByIndex(range);
   int alarm = EEPROM.read(76);
   g_alarm.selectAlarmByIndex(alarm);
+    int lowalarm = EEPROM.read(92);
+  g_lowalarm.selectLowalarmByIndex(lowalarm);
 }
 
 void setupButtons()
@@ -382,8 +409,8 @@ void setupButtons()
     Serial.println("PRESS Mode");
 
     if (g_mainMenu->getCurrentIndex() == 0) {
-      g_mainMenu->setCurrentMenu(9);
-    } else if (g_mainMenu->getCurrentIndex() == 9) {
+      g_mainMenu->setCurrentMenu(11);
+    } else if (g_mainMenu->getCurrentIndex() == 11) {
       g_mainMenu->setCurrentMenu(0);
     }
 
