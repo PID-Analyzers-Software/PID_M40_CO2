@@ -508,13 +508,13 @@ public:
         if(m_currentIndex == 4 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
-        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
-            m_currentIndex = 11;
+        if(m_currentIndex == 9 & m_menuName == "Main Menu"){
+            m_currentIndex = 10;
         }
         if(m_currentIndex == 6 & m_menuName == "Main Menu"){
             m_currentIndex = 7;
         }
-        if(m_currentIndex == 11 & m_menuName == "Main Menu"){
+        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
         Serial.println(m_parentMenuName);

@@ -118,23 +118,23 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 30, "ppm");  // Unit
-  m_display->drawString(15, 30, "CO2");  // Unit
+  m_display->drawString(12, 30, "CO2");  // Unit
 
   m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
   if (alarm != 0) {
-    m_display->drawString(12, 51, "Alm");
+    m_display->drawString(12, 51, "Alm H");
   }
-//  m_display->drawString(115, 51, String(menu->getName()));
-//  if (range == 10000) {
-//    m_display->drawString(20, 51, "R10000");
-//  } else if(range == 5000) {
-//    m_display->drawString(20, 51, "R5000");
-//  }
+  //  m_display->drawString(115, 51, String(menu->getName()));
+  //  if (range == 10000) {
+  //    m_display->drawString(20, 51, "R10000");
+  //  } else if(range == 5000) {
+  //    m_display->drawString(20, 51, "R5000");
+  //  }
 
   if (outport == 1) {
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
-    m_display->drawString(112, 51, "USB");
+    m_display->drawString(114, 51, "USB");
   }
 
   m_display->display();
@@ -180,7 +180,13 @@ void SSD1306RangeMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Range");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(70, 28 , menu->getName());
+  m_display->drawString(60, 22 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+  m_display->drawLine(0, 49, 256, 49);
+
   m_display->setFont(ArialMT_Plain_10);
   m_display->display();
 }
@@ -199,11 +205,16 @@ void SSD1306AlarmMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Alarm");
+  m_display->drawString(64, 0, "Alarm : High");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(70, 28 , menu->getName());
+  m_display->drawString(60, 22 , menu->getName());
   m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+  m_display->drawLine(0, 49, 256, 49);
+
   m_display->display();
 }
 
@@ -220,11 +231,16 @@ void SSD1306LowalarmMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Low Alarm");
+  m_display->drawString(64, 0, "Alarm : Low");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(70, 28 , menu->getName());
+  m_display->drawString(60, 22 , menu->getName());
   m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+    m_display->drawLine(0, 49, 256, 49);
+
   m_display->display();
 }
 
@@ -241,11 +257,16 @@ void SSD1306HourMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Hour");
+  m_display->drawString(64, 0, "Time : Hour");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(64, 28 , menu->getName());
-  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(60, 22 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+    m_display->drawLine(0, 49, 256, 49);
+
   m_display->display();
 }
 
@@ -262,11 +283,16 @@ void SSD1306MinuteMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Minute");
+  m_display->drawString(64, 0, "Time : Minute");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(64, 28 , menu->getName());
-  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(60, 22 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+    m_display->drawLine(0, 49, 256, 49);
+
   m_display->display();
 }
 
@@ -307,11 +333,16 @@ void SSD1306OutportMenuRenderer::render(Menu* menu)
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(64, 0, "Out Port");
+  m_display->drawString(64, 0, "Data Logging");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(70, 28 , menu->getName());
-  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(60, 22 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+    m_display->drawLine(0, 49, 256, 49);
+
   m_display->display();
 }
 

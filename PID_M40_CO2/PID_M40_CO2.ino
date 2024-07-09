@@ -140,7 +140,7 @@ void setup() {
   delay(200);
 
   MenuRenderer* gasMenuRenderer = new SSD1306GasMenuRenderer(&display);
-  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_alarm,&g_lowalarm, &g_range, &g_calvalue, &g_outport);
+  MenuRenderer* runMenuRenderer = new SSD1306RunMenuRenderer(&display, dataSource, &g_gasManager, &g_alarm, &g_lowalarm, &g_range, &g_calvalue, &g_outport);
   MenuRenderer* sleepTimerMenuRenderer = new SSD1306SleepTimerMenuRenderer(&display, &g_sleepTimer);
   MenuRenderer* rangeMenuRenderer = new SSD1306RangeMenuRenderer(&display, &g_range);
   MenuRenderer* alarmMenuRenderer = new SSD1306AlarmMenuRenderer(&display, &g_alarm);
@@ -211,7 +211,7 @@ void setup() {
   vector<Menu*> alarmMenus;
   for (int i = 0; i <= 61; i++) {
     int ppm = 475 + i * 25;
-    String label = "Alarm";
+    String label = "High Alarm";
     if (ppm == 475) {
       alarmMenus.push_back(new AlarmMenuItem("Off", label, i, &g_alarm, alarmMenuRenderer));
     } else {
@@ -225,9 +225,9 @@ void setup() {
   // Low Alarm Menus
   vector<Menu*> lowalarmMenus;
   for (int i = 0; i <= 61; i++) {
-    int ppm = 475 + i * 25;
+    int ppm = -25 + i * 25;
     String label = "Low Alarm";
-    if (ppm == 475) {
+    if (ppm == -25) {
       lowalarmMenus.push_back(new LowalarmMenuItem("Off", label, i, &g_lowalarm, lowalarmMenuRenderer));
     } else {
       lowalarmMenus.push_back(new LowalarmMenuItem(String(ppm) + " ppm", label, i, &g_lowalarm, lowalarmMenuRenderer));
@@ -269,9 +269,17 @@ void setup() {
 
   // outport menus
   vector<Menu*> outportMenus;
-  outportMenus.push_back(new OutportMenuItem("RS232", " Gas", 0, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("USB", " Gas", 1, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("BT", " Gas", 2, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("Off", " Gas", 0, &g_outport, outportMenuRenderer));
+
+  outportMenus.push_back(new OutportMenuItem("RS232:P", " Gas", 1, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("RS232:L", " Gas", 2, &g_outport, outportMenuRenderer));
+
+  outportMenus.push_back(new OutportMenuItem("USB:P", " Gas", 3, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("USB:L", " Gas", 4, &g_outport, outportMenuRenderer));
+
+  outportMenus.push_back(new OutportMenuItem("BT:P", " Gas", 5, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("BT:L", " Gas", 6, &g_outport, outportMenuRenderer));
+
 
   CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
   // DataLogger Menus
@@ -308,7 +316,6 @@ void setup() {
   vector<Menu*> horizontalMenus;
 
   horizontalMenus.push_back(runMenu);
-  //horizontalMenus.push_back(timerMenu);
 
 
   horizontalMenus.push_back(calMenu);
@@ -318,9 +325,7 @@ void setup() {
 
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
-    horizontalMenus.push_back(lowalarmMenu);
-  horizontalMenus.push_back(dataLoggerMenu);
-
+  horizontalMenus.push_back(lowalarmMenu);
   horizontalMenus.push_back(outportMenu);
 
   horizontalMenus.push_back(hourMenu);
@@ -361,7 +366,7 @@ void setup() {
   g_range.selectRangeByIndex(range);
   int alarm = EEPROM.read(76);
   g_alarm.selectAlarmByIndex(alarm);
-    int lowalarm = EEPROM.read(92);
+  int lowalarm = EEPROM.read(92);
   g_lowalarm.selectLowalarmByIndex(lowalarm);
 }
 
@@ -409,8 +414,8 @@ void setupButtons()
     Serial.println("PRESS Mode");
 
     if (g_mainMenu->getCurrentIndex() == 0) {
-      g_mainMenu->setCurrentMenu(11);
-    } else if (g_mainMenu->getCurrentIndex() == 11) {
+      g_mainMenu->setCurrentMenu(10);
+    } else if (g_mainMenu->getCurrentIndex() == 10) {
       g_mainMenu->setCurrentMenu(0);
     }
 
