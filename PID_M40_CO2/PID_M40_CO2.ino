@@ -289,8 +289,8 @@ void setup() {
   vector<Menu*> loggingsetMenus;
   loggingsetMenus.push_back(new LoggingsetMenuItem("Off", " Gas", 0, &g_loggingset, loggingsetMenuRenderer));
 
-  loggingsetMenus.push_back(new LoggingsetMenuItem("L-5sec", " Gas", 1, &g_loggingset, loggingsetMenuRenderer));
-  loggingsetMenus.push_back(new LoggingsetMenuItem("L-30sec", " Gas", 2, &g_loggingset, loggingsetMenuRenderer));
+  loggingsetMenus.push_back(new LoggingsetMenuItem("Auto-5sec", " Gas", 1, &g_loggingset, loggingsetMenuRenderer));
+  loggingsetMenus.push_back(new LoggingsetMenuItem("Auto-30sec", " Gas", 2, &g_loggingset, loggingsetMenuRenderer));
   loggingsetMenus.push_back(new LoggingsetMenuItem("P", " Gas", 3, &g_loggingset, loggingsetMenuRenderer));
 
 
