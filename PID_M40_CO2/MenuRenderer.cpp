@@ -509,7 +509,7 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
-  m_display->drawString(64, 21, "“Place Scrubber on Probe");
+  m_display->drawString(64, 21, "“Place ZeroGas on Probe");
   m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");

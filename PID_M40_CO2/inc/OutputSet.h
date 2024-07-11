@@ -8,7 +8,7 @@
 
 class Outport
 {
-    std::array<int,3> m_outportArray{{0,1,2}};
+    std::array<int,4> m_outportArray{{0,1,2,3}};
 
     int m_selectedOutport = 0;
 

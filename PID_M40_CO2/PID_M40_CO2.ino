@@ -188,15 +188,13 @@ void setup() {
 
   // Timer Menus
   vector<Menu*> sleepTimerMenus;
-  /*
-    sleepTimerMenus.push_back(new SleepTimerMenuItem("5", "TIMER",  0, &g_sleepTimer, sleepTimerMenuRenderer));
-    sleepTimerMenus.push_back(new SleepTimerMenuItem("60", "TIMER", 1, &g_sleepTimer, sleepTimerMenuRenderer));
-    sleepTimerMenus.push_back(new SleepTimerMenuItem("120", "TIMER", 2, &g_sleepTimer, sleepTimerMenuRenderer));
-    sleepTimerMenus.push_back(new SleepTimerMenuItem("360", "TIMER", 3, &g_sleepTimer, sleepTimerMenuRenderer));
-    sleepTimerMenus.push_back(new SleepTimerMenuItem("CONTINUOUS", "TIMER", 4, &g_sleepTimer, sleepTimerMenuRenderer));
+  sleepTimerMenus.push_back(new SleepTimerMenuItem("5", "TIMER",  0, &g_sleepTimer, sleepTimerMenuRenderer));
+  sleepTimerMenus.push_back(new SleepTimerMenuItem("60", "TIMER", 1, &g_sleepTimer, sleepTimerMenuRenderer));
+  sleepTimerMenus.push_back(new SleepTimerMenuItem("120", "TIMER", 2, &g_sleepTimer, sleepTimerMenuRenderer));
+  sleepTimerMenus.push_back(new SleepTimerMenuItem("360", "TIMER", 3, &g_sleepTimer, sleepTimerMenuRenderer));
+  sleepTimerMenus.push_back(new SleepTimerMenuItem("CONTINUOUS", "TIMER", 4, &g_sleepTimer, sleepTimerMenuRenderer));
 
-    CompositeMenu* timerMenu = new CompositeMenu("TIMER","Main Menu" , sleepTimerMenus);
-  */
+  CompositeMenu* timerMenu = new CompositeMenu("TIMER", "Main Menu" , sleepTimerMenus);
 
 
   // Range Menus
@@ -275,14 +273,9 @@ void setup() {
   vector<Menu*> outportMenus;
   outportMenus.push_back(new OutportMenuItem("Off", " Gas", 0, &g_outport, outportMenuRenderer));
 
-  outportMenus.push_back(new OutportMenuItem("RS232-P", " Gas", 1, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("RS232-L", " Gas", 2, &g_outport, outportMenuRenderer));
-
-  outportMenus.push_back(new OutportMenuItem("USB-P", " Gas", 3, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("USB-L", " Gas", 4, &g_outport, outportMenuRenderer));
-
-  outportMenus.push_back(new OutportMenuItem("BT-P", " Gas", 5, &g_outport, outportMenuRenderer));
-  outportMenus.push_back(new OutportMenuItem("BT-L", " Gas", 6, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("RS232", " Gas", 1, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("USB", " Gas", 2, &g_outport, outportMenuRenderer));
+  outportMenus.push_back(new OutportMenuItem("BT", " Gas", 3, &g_outport, outportMenuRenderer));
 
 
   CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
