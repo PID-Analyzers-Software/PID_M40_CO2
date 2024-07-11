@@ -12,7 +12,7 @@
 
 #include "CalvalueSet.h"
 #include "OutputSet.h"
-
+#include "LoggingSet.h"
 #include "DataLogger.h"
 #include "TimeSync.h"
 #include "DataSource.h"
@@ -284,6 +284,31 @@ public:
 
 };
 
+class LoggingsetMenuItem : public Menu
+{
+    Loggingset* m_loggingset  ;
+
+    int m_loggingsetIndex;
+
+public:
+
+    LoggingsetMenuItem(String name, String parentName, int loggingsetIndex, Loggingset* loggingset, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer),
+              m_loggingset(loggingset),
+              m_loggingsetIndex(loggingsetIndex)
+    {
+
+    }
+
+    void action()
+    {
+        m_loggingset->selectLoggingsetByIndex(m_loggingsetIndex);
+    }
+
+};
+
+
+
 
 class DataLoggerFlashStoreMenuItem : public Menu
 {
@@ -508,13 +533,13 @@ public:
         if(m_currentIndex == 4 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
-        if(m_currentIndex == 9 & m_menuName == "Main Menu"){
-            m_currentIndex = 10;
+        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
+            m_currentIndex = 11;
         }
         if(m_currentIndex == 6 & m_menuName == "Main Menu"){
             m_currentIndex = 7;
         }
-        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
+        if(m_currentIndex == 11 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
 
@@ -560,7 +585,7 @@ public:
         if(m_currentIndex == 4 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
-        if(m_currentIndex == 10 & m_menuName == "Main Menu"){
+        if(m_currentIndex == 11 & m_menuName == "Main Menu"){
             m_currentIndex = 0;
         }
         Serial.println("moveToNext" + String(m_currentIndex) + " " + String(m_menus.size()) );

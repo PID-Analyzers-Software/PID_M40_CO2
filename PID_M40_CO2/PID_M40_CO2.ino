@@ -38,6 +38,7 @@
 #include "inc/DataLogger.h"
 #include "inc/DataSource.h"
 #include "inc/image.h"
+#include "inc/LoggingSet.h"
 
 
 
@@ -74,6 +75,7 @@ Hour g_hour;
 Minute g_minute;
 Calvalue g_calvalue;
 Outport g_outport;
+Loggingset g_loggingset;
 DataLogger g_dataLogger;
 
 TimeSync g_timeSync;
@@ -150,6 +152,7 @@ void setup() {
   MenuRenderer* minuteMenuRenderer = new SSD1306MinuteMenuRenderer(&display, &g_minute);
   MenuRenderer* calvalueMenuRenderer = new SSD1306CalvalueMenuRenderer(&display, &g_calvalue);
   MenuRenderer* outportMenuRenderer = new SSD1306OutportMenuRenderer(&display, &g_outport);
+  MenuRenderer* loggingsetMenuRenderer = new SSD1306LoggingsetMenuRenderer(&display, &g_loggingset);
 
   MenuRenderer* flashLoggerMenuRenderer = new SSD1306FlashLoggerMenuRenderer(&display, &g_dataLogger);
   MenuRenderer* wifiDumpMenuRenderer = new SSD1306WiFiDumpMenuRenderer(&display, &g_dataLogger);
@@ -279,6 +282,21 @@ void setup() {
 
 
   CompositeMenu* outportMenu = new CompositeMenu("Outport", "Main Menu" , outportMenus);
+
+
+
+  // loggingset menus
+  vector<Menu*> loggingsetMenus;
+  loggingsetMenus.push_back(new LoggingsetMenuItem("Off", " Gas", 0, &g_loggingset, loggingsetMenuRenderer));
+
+  loggingsetMenus.push_back(new LoggingsetMenuItem("L-5sec", " Gas", 1, &g_loggingset, loggingsetMenuRenderer));
+  loggingsetMenus.push_back(new LoggingsetMenuItem("L-30sec", " Gas", 2, &g_loggingset, loggingsetMenuRenderer));
+  loggingsetMenus.push_back(new LoggingsetMenuItem("P", " Gas", 3, &g_loggingset, loggingsetMenuRenderer));
+
+
+  CompositeMenu* loggingsetMenu = new CompositeMenu("Loggingset", "Main Menu" , loggingsetMenus);
+
+
   // DataLogger Menus
   vector<Menu*> dataLoggerMenus;
 
@@ -323,6 +341,8 @@ void setup() {
   //horizontalMenus.push_back(dateTimeMenu);
   horizontalMenus.push_back(alarmMenu);
   horizontalMenus.push_back(lowalarmMenu);
+  horizontalMenus.push_back(loggingsetMenu);
+
   horizontalMenus.push_back(outportMenu);
 
   horizontalMenus.push_back(hourMenu);
@@ -411,8 +431,8 @@ void setupButtons()
     Serial.println("PRESS Mode");
 
     if (g_mainMenu->getCurrentIndex() == 0) {
-      g_mainMenu->setCurrentMenu(10);
-    } else if (g_mainMenu->getCurrentIndex() == 10) {
+      g_mainMenu->setCurrentMenu(11);
+    } else if (g_mainMenu->getCurrentIndex() == 11) {
       g_mainMenu->setCurrentMenu(0);
     }
 

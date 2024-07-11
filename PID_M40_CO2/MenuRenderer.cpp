@@ -10,6 +10,7 @@
 #include "inc/MinuteSet.h"
 #include "inc/CalvalueSet.h"
 #include "inc/OutputSet.h"
+#include "inc/LoggingSet.h"
 #include <Adafruit_ADS1015.h>
 #include "SSD1306.h"
 #include <Arduino.h>
@@ -345,6 +346,34 @@ void SSD1306OutportMenuRenderer::render(Menu* menu)
 
   m_display->display();
 }
+
+
+///////////////////////////////
+
+
+SSD1306LoggingsetMenuRenderer::SSD1306LoggingsetMenuRenderer(SSD1306Wire* display, Loggingset* loggingset) : SSD1306MenuRenderer(display),
+                                                                                                 m_loggingset(loggingset)
+{
+}
+void SSD1306LoggingsetMenuRenderer::render(Menu* menu)
+{
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(64, 0, "Logging Set");
+    m_display->drawLine(0, 16, 256, 16);
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(60, 24 , menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(12, 51, "Up");
+    m_display->drawString(63, 51, "Enter");
+    m_display->drawString(113, 51, "Down");
+    m_display->drawLine(0, 49, 256, 49);
+
+    m_display->display();
+}
+
 
 
 

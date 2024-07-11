@@ -18,6 +18,7 @@ class Calvalue;
 class Hour;
 class Minute;
 class Outport;
+class Loggingset;
 
 
 class MenuRenderer
@@ -156,6 +157,18 @@ class SSD1306OutportMenuRenderer : public SSD1306MenuRenderer
 public:
 
     SSD1306OutportMenuRenderer(SSD1306Wire* display, Outport* outport);
+
+    void render(Menu* menu);
+};
+
+
+class SSD1306LoggingsetMenuRenderer : public SSD1306MenuRenderer
+{
+    Loggingset* m_loggingset;
+
+public:
+
+    SSD1306LoggingsetMenuRenderer(SSD1306Wire* display, Loggingset* loggingset);
 
     void render(Menu* menu);
 };
