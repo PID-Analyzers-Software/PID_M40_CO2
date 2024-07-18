@@ -202,8 +202,13 @@ void setup() {
 
   // Range Menus
   vector<Menu*> rangeMenus;
-  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range", 0, &g_range, rangeMenuRenderer));
-  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range", 1, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("50 ppm", "Range", 0, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("100 ppm", "Range", 1, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("200 ppm", "Range", 2, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("500 ppm", "Range", 3, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("1000 ppm", "Range", 4, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("5000 ppm", "Range", 5, &g_range, rangeMenuRenderer));
+  rangeMenus.push_back(new RangeMenuItem("10000 ppm", "Range", 6, &g_range, rangeMenuRenderer));
 
   CompositeMenu* rangeMenu = new CompositeMenu("Range", "Main Menu" , rangeMenus);
 
@@ -419,7 +424,7 @@ void setupButtons()
     Serial.println("PRESS RIGHT");
 
     if (g_mainMenu->getCurrentIndex() == 0) {
-      g_mainMenu->setCurrentMenu(5);
+      g_mainMenu->setCurrentMenu(4);
     } else{
       ((CompositeMenu*)g_mainMenu->getCurrentMenu())->moveToNext();
     }

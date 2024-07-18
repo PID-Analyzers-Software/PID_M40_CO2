@@ -30,9 +30,17 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Select Gas");
+  m_display->drawString(64, 0, "Gas Selection");
   m_display->drawLine(0, 16, 256, 16);
-  m_display->drawString(64, 30 , menu->getName());
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(60, 24 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Next");
+  m_display->drawLine(0, 49, 256, 49);
+
+  m_display->setFont(ArialMT_Plain_10);
   m_display->display();
 }
 
@@ -119,7 +127,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 33, "ppm");  // Unit
-  m_display->drawString(12, 28, "CO2");  // Unit
+  m_display->drawString(12, 28, String(selectedGas.getName()));  // Unit
   if (range == 10000) {
     m_display->drawString(115, 20, "R10k");
   } else if (range == 5000) {
@@ -352,26 +360,26 @@ void SSD1306OutportMenuRenderer::render(Menu* menu)
 
 
 SSD1306LoggingsetMenuRenderer::SSD1306LoggingsetMenuRenderer(SSD1306Wire* display, Loggingset* loggingset) : SSD1306MenuRenderer(display),
-                                                                                                 m_loggingset(loggingset)
+  m_loggingset(loggingset)
 {
 }
 void SSD1306LoggingsetMenuRenderer::render(Menu* menu)
 {
-    m_display->clear();
-    m_display->setColor(WHITE);
-    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(64, 0, "Logging Set");
-    m_display->drawLine(0, 16, 256, 16);
-    m_display->setFont(ArialMT_Plain_16);
-    m_display->drawString(60, 24 , menu->getName());
-    m_display->setFont(ArialMT_Plain_10);
-    m_display->drawString(12, 51, "Up");
-    m_display->drawString(63, 51, "Enter");
-    m_display->drawString(113, 51, "Down");
-    m_display->drawLine(0, 49, 256, 49);
+  m_display->clear();
+  m_display->setColor(WHITE);
+  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(64, 0, "Logging Set");
+  m_display->drawLine(0, 16, 256, 16);
+  m_display->setFont(ArialMT_Plain_16);
+  m_display->drawString(60, 24 , menu->getName());
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(12, 51, "Up");
+  m_display->drawString(63, 51, "Enter");
+  m_display->drawString(113, 51, "Down");
+  m_display->drawLine(0, 49, 256, 49);
 
-    m_display->display();
+  m_display->display();
 }
 
 
