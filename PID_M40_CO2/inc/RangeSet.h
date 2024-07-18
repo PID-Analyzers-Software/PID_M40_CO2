@@ -6,10 +6,11 @@
 #include <SSD1306.h>
 #include <Wire.h>
 #include <EEPROM.h>
+#include "GasManager.h"
 
 class Range
 {
-    std::array<int, 2> m_rangeArray{{5000, 10000}};
+    std::array<int, 7> m_rangeArray{{50,100,200,500,1000,5000, 10000}};
     int m_selectedRange = 0;
 
     unsigned long m_startMillis = 0;
