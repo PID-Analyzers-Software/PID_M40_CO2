@@ -8,7 +8,7 @@ protected:
 
     int 			m_refreshRate = 2; //refreshes per second
     unsigned long 	m_lastReadValueTick = -5000000;
-    int 			m_refreshRate_b = 1; //refreshes per second
+    int 			m_refreshRate_b = 2; //refreshes per second
     unsigned long 	m_lastReadValueTick_b = -5000000;
     uint16_t 		m_lastReadValue;
     uint16_t 		m_lastReadValue_battery;
@@ -62,14 +62,14 @@ public:
     {
         unsigned long now = millis();
 
-        if(now - m_lastReadValueTick_b > 5000 / m_refreshRate_b) {
-            const int numReadings  = 2;
+        if(now - m_lastReadValueTick_b > 1000 / m_refreshRate_b) {
+            const int numReadings  = 1;
             long total  = 0;
             m_lastReadValueTick_b = now;
             const float multiplier = 0.125F; //GAIN 1
 
             for (int i = 0; i<numReadings; i++) {
-                total = total +analogRead(27)*0.80586;
+                total += m_ads1115->readADC_SingleEnded(1) * multiplier;
             }
             m_lastReadValue_battery = total / numReadings;
 

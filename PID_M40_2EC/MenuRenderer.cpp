@@ -106,6 +106,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   //m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
   m_display->drawLine(0, 14, 256, 14);
+  m_display->drawLine(0, 49, 256, 49);
+  m_display->drawLine(64, 14, 64, 49);
+
 
   // Check if the reading is above the alarm level
   bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
@@ -121,20 +124,24 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
       m_display->drawString(60, 18, "ALARM");
     }
   } else {
-    m_display->setFont(ArialMT_Plain_24);
-    m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 1));
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(22, 28, String(m_dataSource->getDoubleValue(), 1));
+    m_display->drawString(85, 28, String(v_b/30));
   }
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 33, "ppm");  // Unit
-  m_display->drawString(12, 28, String(selectedGas.getName()));  // Unit
+  m_display->drawString(52, 33, "ppm");  // Unit
+
+  m_display->drawString(20, 15, String(selectedGas.getName()));  // Unit
+  m_display->drawString(84, 15, "CO2");  // Unit
+
   if (range == 10000) {
     m_display->drawString(115, 20, "R10k");
   } else if (range == 5000) {
     m_display->drawString(115, 20, "R5k");
   }
 
-  m_display->drawLine(0, 49, 256, 49);
   m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm H");
