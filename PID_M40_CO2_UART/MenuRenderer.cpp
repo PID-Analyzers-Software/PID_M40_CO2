@@ -1,3 +1,4 @@
+// MenuRenderer.cpp
 #include "inc/MenuRenderer.h"
 #include "inc/Menu.h"
 #include "inc/SleepTimer.h"
@@ -5,7 +6,6 @@
 #include "inc/RangeSet.h"
 #include "inc/AlarmSet.h"
 #include "inc/LowAlarmSet.h"
-
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
 #include "inc/CalvalueSet.h"
@@ -16,136 +16,127 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 
+// Constructor for SSD1306GasMenuRenderer
+SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display) {}
 
-
-SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display)
-
-{
-
-
+void SSD1306GasMenuRenderer::render(Menu* menu) {
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->drawString(64, 0, "Gas Selection");
+    m_display->drawLine(0, 16, 256, 16);
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(60, 24, menu->getName());
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(12, 51, "Up");
+    m_display->drawString(63, 51, "Enter");
+    m_display->drawString(113, 51, "Next");
+    m_display->drawLine(0, 49, 256, 49);
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->display();
 }
 
-void SSD1306GasMenuRenderer::render(Menu* menu)
-{
-  m_display->clear();
-  m_display->setColor(WHITE);
-  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "Gas Selection");
-  m_display->drawLine(0, 16, 256, 16);
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 24 , menu->getName());
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(12, 51, "Up");
-  m_display->drawString(63, 51, "Enter");
-  m_display->drawString(113, 51, "Next");
-  m_display->drawLine(0, 49, 256, 49);
+// Constructor for SSD1306RunMenuRenderer
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(
+    SSD1306Wire* display, 
+    DataSource* dataSource, 
+    GasManager* gasManager, 
+    Alarm* alarm, 
+    Lowalarm* lowalarm, 
+    Range* range, 
+    Calvalue* calvalue, 
+    Outport* outport
+) : SSD1306MenuRenderer(display),
+    m_dataSource(dataSource),
+    m_gasManager(gasManager),
+    m_alarm(alarm),
+    m_lowalarm(lowalarm),
+    m_range(range),
+    m_calvalue(calvalue),
+    m_outport(outport) {}
 
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->display();
-}
+void SSD1306RunMenuRenderer::render(Menu* menu) {
+    const float multiplier = 0.125F; // GAIN 1
+    int range = m_range->getSelectedRange();
+    int alarm = m_alarm->getSelectedAlarm();
+    int lowalarm = m_lowalarm->getSelectedLowalarm();
+    int outport = m_outport->getSelectedOutport();
+    int calvalue = m_calvalue->getSelectedCalvalue();
+    int64_t startMicros = esp_timer_get_time();
+    int v_b = m_dataSource->getRawMiliVolts_battery();
+    Gas& selectedGas = m_gasManager->getSelectedGas();
 
+    // Battery icon bits
+    static const unsigned char battery_bits[] = {
+        0xFE, 0x7F,  // ####### #######
+        0x01, 0x80,  // #             #
+        0xFD, 0xBF,  // # ####### #####
+        0xFD, 0xBF,  // # ####### #####
+        0xFD, 0xBF,  // # ####### #####
+        0xFD, 0xBF,  // # ####### #####
+        0x01, 0x80,  // #             #
+        0xFE, 0x7F   // ####### #######
+    };
 
+    // Blinking toggle
+    static bool displayOn = true;
+    static unsigned long lastBlinkTime = 0;
+    const unsigned long blinkInterval = 500; // Blink interval in milliseconds
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Lowalarm* lowalarm, Range* range, Calvalue* calvalue, Outport* outport) : SSD1306MenuRenderer(display),
-  m_dataSource(dataSource),
-  m_gasManager(gasManager),
-  m_alarm(alarm),
-  m_lowalarm(lowalarm),
-  m_range(range),
-  m_calvalue(calvalue),
-  m_outport(outport)
-{
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_LEFT);
+    m_display->setFont(ArialMT_Plain_10);
 
-}
-//SimpleKalmanFilter simpleKalmanFilter(2, 2, 0.1);
+    // Display date & time
+    struct tm timeinfo;
+    getLocalTime(&timeinfo, 10);
+    char dateString[30] = { 0 };
+    char timeString[30] = { 0 };
+    strftime(dateString, 30, "%b %d %y", &timeinfo);
+    strftime(timeString, 30, "%H:%M", &timeinfo);
+    m_display->drawString(0, 0, String(timeString));
+    m_display->drawXbm(110, 2, 16, 8, battery_bits);
 
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->drawString(64, 0, "26C  30%");
+    m_display->drawLine(0, 14, 128, 14);
+    m_display->drawLine(0, 39, 256, 39);
+    m_display->drawLine(64, 14, 64, 64);
 
-void SSD1306RunMenuRenderer::render(Menu* menu)
-{
-  const float multiplier = 0.125F; //GAIN 1
-  int range = m_range->getSelectedRange();
-  int alarm = m_alarm->getSelectedAlarm();
-  int lowalarm = m_lowalarm->getSelectedLowalarm();
-  int outport = m_outport->getSelectedOutport();
-  int calvalue = m_calvalue->getSelectedCalvalue();
-  int64_t startMicros = esp_timer_get_time();
-  int v_b = m_dataSource->getRawMiliVolts_battery();
-  Gas& selectedGas = m_gasManager->getSelectedGas();
-  static const unsigned char battery_bits[] = {
-    0xFE, 0x7F,  // ####### #######
-    0x01, 0x80,  // #             #
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0x01, 0x80,  // #             #
-    0xFE, 0x7F   // ####### #######
-  };
-  static bool displayOn = true;  // Toggle for blinking
-  static unsigned long lastBlinkTime = 0;
-  const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
+    // Check if the reading is above the alarm level
+    bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
 
-  m_display->clear();
-  m_display->setColor(WHITE);
-  m_display->setTextAlignment(TEXT_ALIGN_LEFT);
-  m_display->setFont(ArialMT_Plain_10);
-
-
-
-  Serial.println("display ed");
-
-
-
-  // Date & Time
-  struct tm timeinfo;
-  getLocalTime(&timeinfo, 10);
-  char dateString[30] = { 0 };
-  char timeString[30] = { 0 };
-  strftime(dateString, 30, "%b %d %y", &timeinfo);
-  strftime(timeString, 30, "%H:%M", &timeinfo);
-  m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110 , 2, 16, 8, battery_bits);
-
-  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "26C  30%");
-  //m_display->drawString(64, 0, "CO2");
-
-  //m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
-  m_display->drawLine(0, 14, 128, 14);
-  m_display->drawLine(0, 39, 256, 39);
-  m_display->drawLine(64, 14, 64, 64);
-
-
-  // Check if the reading is above the alarm level
-  bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
-
-
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(10, 28, "O2%");  // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(34, 20, String(m_dataSource->getRawMiliVolts()));
-
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(75, 28, "CO");  // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(105, 20, String(v_b));
+    // Display gas concentration values
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(9, 17, "O2"); // Unit
+    m_display->drawString(12, 27, "%VOL"); // Unit
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(40, 18, String(m_dataSource->getRawMiliVolts() / 10.0, 1));
 
     m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(10, 53, "H2S");  // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(34, 46, String(m_dataSource->getRawMiliVolts()));
+    m_display->drawString(75, 17, "CO"); // Unit
+    m_display->drawString(75, 27, "ppm"); // Unit
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(105, 18, String(m_dataSource->getCOValue()));
 
     m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(79, 53, "CH4%");  // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(106, 46, String(m_dataSource->getRawMiliVolts()));
+    m_display->drawString(10, 42, "H2S"); // Unit
+    m_display->drawString(10, 52, "ppm"); // Unit
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(40, 44, String(m_dataSource->getH2SValue()));
 
-  m_display->display();
-  delay(100);  // Consider adjusting this delay based on your application's requirements
+    m_display->setFont(ArialMT_Plain_10);
+    m_display->drawString(78, 42, "CH4"); // Unit
+    m_display->drawString(79, 53, "%LEL"); // Unit
+    m_display->setFont(ArialMT_Plain_16);
+    m_display->drawString(105, 44, String(m_dataSource->getRawMiliVolts_battery() / 10.0, 1));
+
+    m_display->display();
+    delay(100); // Adjust this delay based on your application's requirements
 }
 
-
-///////////////////////////
+///////////////////
 
 SSD1306SleepTimerMenuRenderer::SSD1306SleepTimerMenuRenderer(SSD1306Wire* display, SleepTimer* sleepTimer) : SSD1306MenuRenderer(display),
   m_sleepTimer(sleepTimer)
