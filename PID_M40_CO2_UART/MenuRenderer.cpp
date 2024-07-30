@@ -99,7 +99,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   m_display->drawXbm(110, 2, 16, 8, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "26C  30%");
+  m_display->drawString(64, 0, String(alarm));
   m_display->drawLine(0, 14, 128, 14);
   m_display->drawLine(0, 39, 256, 39);
   m_display->drawLine(64, 14, 64, 64);
