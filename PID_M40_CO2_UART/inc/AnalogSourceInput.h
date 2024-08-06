@@ -1,4 +1,3 @@
-// AnalogSourceInput.h
 #pragma once
 #include <HardwareSerial.h>
 
@@ -8,26 +7,21 @@ extern HardwareSerial sensorSerial;
 // Base class for analog source input
 class AnalogSourceInput {
 protected:
-    int m_refreshRate = 1; // Refreshes per second
-    unsigned long m_lastReadValueTick = -5000000; // Last read value timestamp for O2
-    int m_refreshRate_b = 1; // Refreshes per second for battery
-    unsigned long m_lastReadValueTick_b = -5000000; // Last read value timestamp for battery
-    uint16_t m_lastReadValue; // Last read O2 value
-    uint16_t m_lastReadValue_battery; // Last read battery value
-    int m_refreshRate_co = 1; // Refreshes per second for CO
-    unsigned long m_lastReadValueTick_co = -5000000; // Last read value timestamp for CO
-    uint16_t m_lastReadValue_co; // Last read CO value
-    int m_refreshRate_h2s = 1; // Refreshes per second for H2S
-    unsigned long m_lastReadValueTick_h2s = -5000000; // Last read value timestamp for H2S
-    uint16_t m_lastReadValue_h2s; // Last read H2S value
+    unsigned long m_lastReadValueTick = -5000000; // Last read value timestamp
+    uint16_t m_lastO2Value; // Last read O2 value
+    uint16_t m_lastCH4Value; // Last read CH4 value
+    uint16_t m_lastCOValue; // Last read CO value
+    uint16_t m_lastH2SValue; // Last read H2S value
 
 public:
-    // Pure virtual functions for getting millivolt values
-    virtual uint16_t getMiliVolts() = 0;
-    virtual uint16_t getMiliVolts_battery() = 0;
-    // Virtual functions for gas values with default implementation returning 0
-    virtual uint16_t getCOValue() = 0;
-    virtual uint16_t getH2SValue() = 0;
+    // Pure virtual function for getting millivolt values
+    virtual void readAllValues() = 0;
+
+    virtual uint16_t getO2Value() const { return m_lastO2Value; }
+    virtual uint16_t getCH4Value() const { return m_lastCH4Value; }
+    virtual uint16_t getCOValue() const { return m_lastCOValue; }
+    virtual uint16_t getH2SValue() const { return m_lastH2SValue; }
+
     virtual ~AnalogSourceInput() = default;
 };
 
@@ -37,84 +31,45 @@ public:
     UARTAnalogSourceInput() = default;
     ~UARTAnalogSourceInput() = default;
 
-    // Override function to get O2 value in millivolts
-    uint16_t getMiliVolts() override {
+    // Override function to read all values
+    void readAllValues() override {
         unsigned long now = millis();
         if (now - m_lastReadValueTick > 4000) {
             m_lastReadValueTick = now;
-            uint16_t o2Value = readUARTValue(2); // Read O2 value from UART
-            m_lastReadValue = o2Value / 1.0;
-            Serial.println("O2 Value: " + String(m_lastReadValue / 10.0, 1) + " %VOL");
-        }
-        return m_lastReadValue;
-    }
 
-    // Override function to get battery (CH4) value in millivolts
-    uint16_t getMiliVolts_battery() override {
-        unsigned long now = millis();
-        if (now - m_lastReadValueTick_b > 4000) {
-            m_lastReadValueTick_b = now;
-            uint16_t batteryValue = readUARTValue(3); // Read battery value from UART
-            m_lastReadValue_battery = batteryValue;
-            Serial.println("Battery (CH4) Value: " + String(batteryValue / 10.0, 1) + " %LEL");
-        }
-        return m_lastReadValue_battery;
-    }
+            uint8_t rawData[11];
+            int length;
 
-    // Override function to get CO value
-    uint16_t getCOValue() override {
-        unsigned long now = millis();
-        if (now - m_lastReadValueTick_co > 4000) {
-            m_lastReadValueTick_co = now;
-            uint16_t coValue = readUARTValue(0); // Read CO value from UART
-            m_lastReadValue_co = coValue;
-            Serial.println("CO Value: " + String(coValue / 10.0, 1) + " ppm");
-        }
-        return m_lastReadValue_co;
-    }
-
-    // Override function to get H2S value
-    uint16_t getH2SValue() override {
-        unsigned long now = millis();
-        if (now - m_lastReadValueTick_h2s > 4000) {
-            m_lastReadValueTick_h2s = now;
-            uint16_t h2sValue = readUARTValue(1); // Read H2S value from UART
-            m_lastReadValue_h2s = h2sValue;
-            Serial.println("H2S Value: " + String(h2sValue / 10.0, 1) + " ppm");
-        }
-        return m_lastReadValue_h2s;
-    }
-
-private:
-    // Function to read UART value based on data position
-    uint16_t readUARTValue(uint8_t dataPosition) {
-        uint8_t rawData[11];
-        int length;
-
-        // Attempt to read the correct length of data up to a maximum of 2 retries
-        for (int retries = 0; retries < 2; ++retries) {
+            // Attempt to read the correct length of data up to a maximum of 2 retries
             length = sensorSerial.readBytes(rawData, sizeof(rawData));
+            Serial.print("Raw Data: ");
+            for (int i = 0; i < length; i++) {
+                Serial.print(rawData[i], HEX);
+                Serial.print(" ");
+            }
+            Serial.println();
+
+
             if (length == 11) {
-                break;
-            } else if (length == 0) {
-                delay(10); // Short delay before retrying
-            } else {
-                return 0; // Data length mismatch
+                uint8_t checksum = 0;
+                for (int i = 1; i < 10; i++) {
+                    checksum += rawData[i];
+                }
+                checksum = (~checksum) + 1;
+
+                if (checksum == rawData[10]) {
+                    m_lastH2SValue = (rawData[4] << 8) | rawData[5];       // O2 value
+                    m_lastO2Value = (rawData[6] << 8) | rawData[7];      // CH4 value
+                    m_lastCOValue = (rawData[2] << 8) | rawData[3];       // CO value
+                    m_lastCH4Value = (rawData[8] << 8) | rawData[9];      // H2S value
+
+                    // Print values for debugging
+                    Serial.print("O2: " + String(m_lastO2Value / 10.0, 1) + " %VOL  ");
+                    Serial.print("CH4: " + String(m_lastCH4Value / 1.0, 1) + " %LEL  ");
+                    Serial.print("CO: " + String(m_lastCOValue / 1.0, 1) + " ppm  ");
+                    Serial.print("H2S: " + String(m_lastH2SValue / 1.0, 1) + " ppm  ");
+                }
             }
         }
-
-        if (length == 11) {
-            uint8_t checksum = 0;
-            for (int i = 1; i < 10; i++) {
-                checksum += rawData[i];
-            }
-            checksum = (~checksum) + 1;
-
-            if (checksum == rawData[10]) {
-                uint16_t value = (rawData[dataPosition * 2 + 2] << 8) | rawData[dataPosition * 2 + 3];
-                return value;
-            }
-        }
-        return 0; // Checksum invalid
     }
 };

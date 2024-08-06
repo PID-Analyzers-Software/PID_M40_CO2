@@ -55,6 +55,7 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(
   m_calvalue(calvalue),
   m_outport(outport) {}
 
+
 void SSD1306RunMenuRenderer::render(Menu* menu) {
   const float multiplier = 0.125F; // GAIN 1
   int range = m_range->getSelectedRange();
@@ -63,8 +64,11 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
-  int v_b = m_dataSource->getRawMiliVolts_battery();
+  int v_b = m_dataSource->getCH4Value();
   Gas& selectedGas = m_gasManager->getSelectedGas();
+
+  // Read all sensor values
+  m_dataSource->readAllValues();
 
   // Battery icon bits
   static const unsigned char battery_bits[] = {
@@ -96,12 +100,12 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110, 2, 16, 8, battery_bits);
+  m_display->drawXbm(110, 2, 15, 7, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, String(alarm));
+  m_display->drawString(64, 0, "ALM H  LOG");
   m_display->drawLine(0, 14, 128, 14);
-  m_display->drawLine(0, 39, 256, 39);
+  m_display->drawLine(0, 39, 128, 39);
   m_display->drawLine(64, 14, 64, 64);
 
   // Check if the reading is above the alarm level
@@ -112,26 +116,26 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   m_display->drawString(9, 17, "O2"); // Unit
   m_display->drawString(12, 27, "%VOL"); // Unit
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(40, 18, String(m_dataSource->getRawMiliVolts() / 10.0, 1));
+  m_display->drawString(44, 18, String(m_dataSource->getO2Value() / 10.0, 1));
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(75, 17, "CO"); // Unit
   m_display->drawString(75, 27, "ppm"); // Unit
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(105, 18, String(m_dataSource->getCOValue()));
+  m_display->drawString(107, 18, String(m_dataSource->getCOValue()));
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(10, 42, "H2S"); // Unit
   m_display->drawString(10, 52, "ppm"); // Unit
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(40, 44, String(m_dataSource->getH2SValue()));
+  m_display->drawString(44, 44, String(m_dataSource->getH2SValue()));
 
-  m_display->setFont(ArialMT_Plain_10);
+    m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(78, 42, "CH4"); // Unit
   m_display->drawString(79, 53, "%LEL"); // Unit
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(105, 44, String(m_dataSource->getRawMiliVolts_battery() / 10.0, 1));
-
+  m_display->drawString(107, 44, String(m_dataSource->getCH4Value()));
+  
   m_display->display();
   delay(100); // Adjust this delay based on your application's requirements
 }
@@ -533,7 +537,7 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 21, "“Place ZeroGas on Probe");
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getO2Value()) + "mV").c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
@@ -554,7 +558,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getO2Value()) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();

@@ -451,7 +451,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate(m_dataSource->getRawMiliVolts());
+        m_gasManager->calibrate(m_dataSource->getO2Value());
     }
 
 };
@@ -474,7 +474,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate2(m_dataSource->getRawMiliVolts());
+        m_gasManager->calibrate2(m_dataSource->getO2Value());
     }
 
 };

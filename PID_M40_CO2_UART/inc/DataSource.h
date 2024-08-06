@@ -1,4 +1,3 @@
-// DataSource.h
 #pragma once
 
 #include "AnalogSourceInput.h"
@@ -13,17 +12,16 @@ public:
 
     ~DataSource() = default;
 
-    uint16_t getRawMiliVolts() const {
-        return m_analogSourceInput->getMiliVolts();
+    void readAllValues() const {
+        m_analogSourceInput->readAllValues();
     }
 
-    uint16_t getRawMiliVolts_battery() const {
-        return m_analogSourceInput->getMiliVolts_battery();
+    uint16_t getO2Value() const {
+        return m_analogSourceInput->getO2Value();
     }
 
-    double getDoubleValue() {
-        uint16_t miliVolts = m_analogSourceInput->getMiliVolts();
-        return m_gasManager->calculateSLM(miliVolts / 1000.0);
+    uint16_t getCH4Value() const {
+        return m_analogSourceInput->getCH4Value();
     }
 
     uint16_t getCOValue() const {
@@ -32,5 +30,10 @@ public:
 
     uint16_t getH2SValue() const {
         return m_analogSourceInput->getH2SValue();
+    }
+
+    double getDoubleValue() {
+        uint16_t o2Value = m_analogSourceInput->getO2Value();
+        return m_gasManager->calculateSLM(o2Value / 1000.0);
     }
 };
