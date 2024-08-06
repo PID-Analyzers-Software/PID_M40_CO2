@@ -37,7 +37,7 @@ public:
     // Override function to read all values
     void readAllValues() override {
         unsigned long now = millis();
-        if (now - m_lastReadValueTick > 5000) {
+        if (now - m_lastReadValueTick > 2000) {
             m_lastReadValueTick = now;
 
             uint8_t rawData[11];
