@@ -1,5 +1,7 @@
 #pragma once
 #include <HardwareSerial.h>
+#define DATA_LENGTH 11
+#define START_BYTE 0xFF
 
 // External declaration of the HardwareSerial object for UART readings
 extern HardwareSerial sensorSerial;
@@ -26,6 +28,7 @@ public:
 };
 
 // Derived class for UART analog source input
+// Derived class for UART analog source input
 class UARTAnalogSourceInput : public AnalogSourceInput {
 public:
     UARTAnalogSourceInput() = default;
@@ -34,23 +37,39 @@ public:
     // Override function to read all values
     void readAllValues() override {
         unsigned long now = millis();
-        if (now - m_lastReadValueTick > 4000) {
+        if (now - m_lastReadValueTick > 5000) {
             m_lastReadValueTick = now;
 
             uint8_t rawData[11];
-            int length;
+            int length = 0;
 
-            // Attempt to read the correct length of data up to a maximum of 2 retries
-            length = sensorSerial.readBytes(rawData, sizeof(rawData));
+            // Attempt to read data until we get a valid start byte
+            while (true) {
+                if (sensorSerial.available() >= 1) {
+                    uint8_t byte = sensorSerial.read();
+
+                    // Start byte found, read the rest of the data
+                    if (byte == START_BYTE) {
+                        rawData[0] = byte;
+                        length = sensorSerial.readBytes(rawData + 1, DATA_LENGTH - 1);
+
+                        // Ensure the data is complete
+                        if (length == DATA_LENGTH - 1) {
+                            break;
+                        }
+                    }
+                }
+                delay(10); // Short delay to avoid busy-waiting
+            }
+
             Serial.print("Raw Data: ");
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < DATA_LENGTH; i++) {
                 Serial.print(rawData[i], HEX);
                 Serial.print(" ");
             }
             Serial.println();
 
-
-            if (length == 11) {
+            if (length == DATA_LENGTH - 1) {
                 uint8_t checksum = 0;
                 for (int i = 1; i < 10; i++) {
                     checksum += rawData[i];
@@ -68,7 +87,11 @@ public:
                     Serial.print("CH4: " + String(m_lastCH4Value / 1.0, 1) + " %LEL  ");
                     Serial.print("CO: " + String(m_lastCOValue / 1.0, 1) + " ppm  ");
                     Serial.print("H2S: " + String(m_lastH2SValue / 1.0, 1) + " ppm  ");
+                } else {
+                    Serial.println("Checksum invalid");
                 }
+            } else {
+                Serial.println("Invalid data length");
             }
         }
     }
