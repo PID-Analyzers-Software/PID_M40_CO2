@@ -146,25 +146,17 @@ public:
 
 };
 
-class AlarmMenuItem : public Menu
-{
+class AlarmMenuItem : public Menu {
     Alarm* m_alarm;
-
     int m_alarmIndex;
+    int m_gasIndex;
 
 public:
+    AlarmMenuItem(String name, String parentName, int alarmIndex, int gasIndex, Alarm* alarm, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer), m_alarm(alarm), m_alarmIndex(alarmIndex), m_gasIndex(gasIndex) {}
 
-    AlarmMenuItem(String name, String parentName, int alarmIndex, Alarm* alarm, MenuRenderer* renderer)
-            : Menu(name, parentName, renderer),
-              m_alarm(alarm),
-              m_alarmIndex(alarmIndex)
-    {
-
-    }
-
-    void action()
-    {
-        m_alarm->selectAlarmByIndex(m_alarmIndex);
+    void action() {
+        m_alarm->selectAlarmByIndex(m_gasIndex, m_alarmIndex);
     }
 };
 

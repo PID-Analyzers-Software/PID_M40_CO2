@@ -59,7 +59,7 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(
 void SSD1306RunMenuRenderer::render(Menu* menu) {
   const float multiplier = 0.125F; // GAIN 1
   int range = m_range->getSelectedRange();
-  int alarm = m_alarm->getSelectedAlarm();
+  int alarm = m_alarm->getSelectedAlarm(0);
   int lowalarm = m_lowalarm->getSelectedLowalarm();
   int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
@@ -72,14 +72,14 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
 
   // Battery icon bits
   static const unsigned char battery_bits[] = {
-    0xFE, 0x7F,  // ####### #######
+    0xFF, 0x7F,  // ####### #######
     0x01, 0x80,  // #             #
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
     0x01, 0x80,  // #             #
-    0xFE, 0x7F   // ####### #######
+    0xFF, 0x7F   // ####### #######
   };
 
   // Blinking toggle
@@ -100,7 +100,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110, 2, 15, 7, battery_bits);
+  m_display->drawXbm(110, 3, 16, 8, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "ALM H  LOG");
@@ -130,12 +130,12 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
   m_display->setFont(ArialMT_Plain_16);
   m_display->drawString(44, 44, String(m_dataSource->getH2SValue()));
 
-    m_display->setFont(ArialMT_Plain_10);
+  m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(78, 42, "CH4"); // Unit
   m_display->drawString(79, 53, "%LEL"); // Unit
   m_display->setFont(ArialMT_Plain_16);
   m_display->drawString(107, 44, String(m_dataSource->getCH4Value()));
-  
+
   m_display->display();
   delay(100); // Adjust this delay based on your application's requirements
 }
@@ -199,7 +199,7 @@ SSD1306AlarmMenuRenderer::SSD1306AlarmMenuRenderer(SSD1306Wire* display, Alarm* 
 
 void SSD1306AlarmMenuRenderer::render(Menu* menu)
 {
-  int alarm = m_alarm->getSelectedAlarm();
+  int alarm = m_alarm->getSelectedAlarm(0);
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);

@@ -55,6 +55,13 @@ using namespace std;
 #define wifi_ssid "22CDPro"
 #define wifi_password "00525508"
 
+
+#define GAS_INDEX_CO 0
+#define GAS_INDEX_H2S 1
+#define GAS_INDEX_O2 2
+#define GAS_INDEX_CH4 3
+
+
 GasManager g_gasManager(-2.054456771, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
 WebServer g_webServer;
@@ -129,7 +136,7 @@ void setup() {
 
   // Initialize the sensor serial port
   sensorSerial.begin(9600, SERIAL_8N1, rxPin, txPin);
-  
+
   AnalogSourceInput* uartAnalogSourceInput = new UARTAnalogSourceInput();
 
   DataSource* dataSource = new DataSource(&g_gasManager, uartAnalogSourceInput);
@@ -137,10 +144,10 @@ void setup() {
   // Gas Manager
   g_gasManager.setConfigurationManager(&g_configurationManager);
 
-  g_gasManager.addGas(Gas("CO2", 1.0));
-  g_gasManager.addGas(Gas("H2S", 1.0));
   g_gasManager.addGas(Gas("CO", 1.0));
-  g_gasManager.addGas(Gas("O2", 5.73));
+  g_gasManager.addGas(Gas("H2S", 1.0));
+  g_gasManager.addGas(Gas("O2", 1.0));
+  g_gasManager.addGas(Gas("CH4", 5.73));
   g_gasManager.addGas(Gas("H2", 6.84));
   g_gasManager.addGas(Gas("ArCH4", 0.85));
   //
@@ -196,10 +203,10 @@ void setup() {
   vector<Menu*> gasMenus;
 
 
-  gasMenus.push_back(new GasMenuItem("CO2", "LIBRARY",  0, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("CO", "LIBRARY",  0, &g_gasManager, gasMenuRenderer));
   gasMenus.push_back(new GasMenuItem("H2S", "LIBRARY", 1, &g_gasManager, gasMenuRenderer));
-  gasMenus.push_back(new GasMenuItem("CO", "LIBRARY", 2, &g_gasManager, gasMenuRenderer));
-  gasMenus.push_back(new GasMenuItem("O2", "LIBRARY",  3, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("O2", "LIBRARY", 2, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("CH4", "LIBRARY",  3, &g_gasManager, gasMenuRenderer));
   // gasMenus.push_back(new GasMenuItem("DET 5", "LIBRARY", 4, &g_gasManager, gasMenuRenderer));
   //  gasMenus.push_back(new GasMenuItem("DET 6", "LIBRARY", 5, &g_gasManager, gasMenuRenderer));
 
@@ -230,18 +237,67 @@ void setup() {
 
 
   // Alarm Menus
-  vector<Menu*> alarmMenus;
+  // Alarm Menus for CO
+  vector<Menu*> coAlarmMenus;
   for (int i = 0; i <= 61; i++) {
     int ppm = 475 + i * 25;
-    String label = "High Alarm";
+    String label = "CO High Alarm";
     if (ppm == 475) {
-      alarmMenus.push_back(new AlarmMenuItem("Off", label, i, &g_alarm, alarmMenuRenderer));
+      coAlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_CO, &g_alarm, alarmMenuRenderer));
     } else {
-      alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, &g_alarm, alarmMenuRenderer));
+      coAlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_CO, &g_alarm, alarmMenuRenderer));
     }
   }
+  CompositeMenu* coAlarmMenu = new CompositeMenu("CO Alarm", "Main Menu", coAlarmMenus);
 
-  CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
+  // Alarm Menus for H2S
+  vector<Menu*> h2sAlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "H2S High Alarm";
+    if (ppm == 475) {
+      h2sAlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_H2S, &g_alarm, alarmMenuRenderer));
+    } else {
+      h2sAlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_H2S, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* h2sAlarmMenu = new CompositeMenu("H2S Alarm", "Main Menu", h2sAlarmMenus);
+
+  // Alarm Menus for O2
+  vector<Menu*> o2AlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "O2 High Alarm";
+    if (ppm == 475) {
+      o2AlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_O2, &g_alarm, alarmMenuRenderer));
+    } else {
+      o2AlarmMenus.push_back(new AlarmMenuItem(String(ppm / 10.0) + " %VOL", label, i, GAS_INDEX_O2, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* o2AlarmMenu = new CompositeMenu("O2 Alarm", "Main Menu", o2AlarmMenus);
+
+  // Alarm Menus for CH4
+  vector<Menu*> ch4AlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "CH4 High Alarm";
+    if (ppm == 475) {
+      ch4AlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_CH4, &g_alarm, alarmMenuRenderer));
+    } else {
+      ch4AlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_CH4, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* ch4AlarmMenu = new CompositeMenu("CH4 Alarm", "Main Menu", ch4AlarmMenus);
+
+  // Add all alarm menus to the main menu
+  vector<Menu*> mainMenus;
+  mainMenus.push_back(coAlarmMenu);
+  mainMenus.push_back(h2sAlarmMenu);
+  mainMenus.push_back(o2AlarmMenu);
+  mainMenus.push_back(ch4AlarmMenu);
+
+  CompositeMenu* mainMenu = new CompositeMenu("Main Menu", "", mainMenus);
+
 
 
   // Low Alarm Menus
@@ -360,7 +416,7 @@ void setup() {
   horizontalMenus.push_back(libraryMenu);
 
   //horizontalMenus.push_back(dateTimeMenu);
-  horizontalMenus.push_back(alarmMenu);
+  horizontalMenus.push_back(coAlarmMenu);
   horizontalMenus.push_back(lowalarmMenu);
   horizontalMenus.push_back(loggingsetMenu);
 
@@ -402,8 +458,11 @@ void setup() {
   g_timeSync.initTimeFromRTC();
   int range = EEPROM.read(72);
   g_range.selectRangeByIndex(range);
-  int alarm = EEPROM.read(76);
-  g_alarm.selectAlarmByIndex(alarm);
+  for (int gasIndex = 0; gasIndex < 4; gasIndex++) {
+    int alarmAddress = 96 + (gasIndex * 4);
+    int alarm = EEPROM.read(alarmAddress);
+    g_alarm.selectAlarmByIndex(gasIndex, alarm);
+  }
   int lowalarm = EEPROM.read(92);
   g_lowalarm.selectLowalarmByIndex(lowalarm);
 }

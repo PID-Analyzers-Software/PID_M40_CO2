@@ -8,93 +8,83 @@
 
 class Alarm
 {
-    std::array<int,62> m_alarmArray{{0, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300, 1325, 1350, 1375, 1400, 1425, 1450, 1475, 1500, 1525, 1550, 1575, 1600, 1625, 1650, 1675, 1700, 1725, 1750, 1775, 1800, 1825, 1850, 1875, 1900, 1925, 1950, 1975, 2000}};
-
-    int m_selectedAlarm = 0;
+    std::array<int, 62> m_alarmArray{{0, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000, 1025, 1050, 1075, 1100, 1125, 1150, 1175, 1200, 1225, 1250, 1275, 1300, 1325, 1350, 1375, 1400, 1425, 1450, 1475, 1500, 1525, 1550, 1575, 1600, 1625, 1650, 1675, 1700, 1725, 1750, 1775, 1800, 1825, 1850, 1875, 1900, 1925, 1950, 1975, 2000}};
+    std::array<int, 4> m_selectedAlarms{{0, 0, 0, 0}};  // Assuming 4 gas types
 
     unsigned long m_startMillis = 0;
 
     ConfigurationManager* m_configurationManager;
-    //U8G2_SSD1327_MIDAS_128X128_F_4W_HW_SPI* m_u8g2;
     U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* m_u8g2;
     SSD1306* m_display;
 
-
 public:
+    Alarm() = default;
+    ~Alarm() = default;
 
-    Alarm()
-    {
-        m_selectedAlarm = 0;
-    }
-
-    ~Alarm()=default;
-
-    void init(ConfigurationManager* configurationManager, U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* u8g2)
-    {
+    void init(ConfigurationManager* configurationManager, U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* u8g2) {
         m_configurationManager = configurationManager;
         m_u8g2 = u8g2;
     }
 
-    void selectAlarmByValueNoEEPROMSave(int alarm)
-    {
-        for(int i=0; i < m_alarmArray.size(); i++)
-            if(m_alarmArray[i] == alarm)
-            {
-                m_selectedAlarm = i;
+    void selectAlarmByValueNoEEPROMSave(int gasIndex, int alarm) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return;
+
+        for (int i = 0; i < m_alarmArray.size(); i++) {
+            if (m_alarmArray[i] == alarm) {
+                m_selectedAlarms[gasIndex] = i;
                 break;
             }
-
-        return;
+        }
     }
 
-    void selectAlarmByIndex(int index)
-    {
-        if(index >= 0 && index < m_alarmArray.size())
-        {
-            m_selectedAlarm = index;
-            EEPROM.writeInt(76, index);
+    void selectAlarmByIndex(int gasIndex, int index) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return;
+        if (index >= 0 && index < m_alarmArray.size()) {
+            m_selectedAlarms[gasIndex] = index;
+            EEPROM.writeInt(96 + gasIndex * 4, index);
             EEPROM.commit();
-            Serial.print("Alarm saved ");
+            Serial.print("Alarm saved for gas index ");
+            Serial.print(gasIndex);
+            Serial.print(": ");
             Serial.println(index);
         }
-
-        return;
     }
 
-    void selectAlarmByValue(int alarm)
-    {
-        for(int i=0; i < m_alarmArray.size(); i++)
-            if(m_alarmArray[i] == alarm)
-            {
-                m_selectedAlarm = i;
-                m_configurationManager->saveAlarmToEEPROM(i);
+    void selectAlarmByValue(int gasIndex, int alarm) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return;
+
+        for (int i = 0; i < m_alarmArray.size(); i++) {
+            if (m_alarmArray[i] == alarm) {
+                m_selectedAlarms[gasIndex] = i;
+                m_configurationManager->saveAlarmToEEPROM(gasIndex, i);
                 break;
             }
-
-        return;
+        }
     }
 
-    void selectNextAlarm()
-    {
-        m_selectedAlarm = (m_selectedAlarm + 1) % m_alarmArray.size();
+    void selectNextAlarm(int gasIndex) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return;
+
+        m_selectedAlarms[gasIndex] = (m_selectedAlarms[gasIndex] + 1) % m_alarmArray.size();
     }
 
-    void selectPreviousAlarm()
-    {
-        if(m_selectedAlarm == 0)
-            m_selectedAlarm = m_alarmArray.size() - 1;
-        else
-            m_selectedAlarm = m_selectedAlarm - 1;
+    void selectPreviousAlarm(int gasIndex) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return;
+
+        if (m_selectedAlarms[gasIndex] == 0) {
+            m_selectedAlarms[gasIndex] = m_alarmArray.size() - 1;
+        } else {
+            m_selectedAlarms[gasIndex] = m_selectedAlarms[gasIndex] - 1;
+        }
     }
 
-    void resetIdleCounter()
-    {
+    void resetIdleCounter() {
         m_startMillis = millis();
     }
 
-    int getSelectedAlarm() {
-        int alarm = EEPROM.read(76);
+    int getSelectedAlarm(int gasIndex) {
+        if (gasIndex < 0 || gasIndex >= m_selectedAlarms.size()) return -1;
+        int alarm = EEPROM.read(76 + gasIndex);
         return m_alarmArray[alarm];
     }
-
 };

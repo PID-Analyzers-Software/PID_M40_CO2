@@ -62,12 +62,6 @@ public:
                 delay(10); // Short delay to avoid busy-waiting
             }
 
-            Serial.print("Raw Data: ");
-            for (int i = 0; i < DATA_LENGTH; i++) {
-                Serial.print(rawData[i], HEX);
-                Serial.print(" ");
-            }
-            Serial.println();
 
             if (length == DATA_LENGTH - 1) {
                 uint8_t checksum = 0;
@@ -86,12 +80,10 @@ public:
                     Serial.print("O2: " + String(m_lastO2Value / 10.0, 1) + " %VOL  ");
                     Serial.print("CH4: " + String(m_lastCH4Value / 1.0, 1) + " %LEL  ");
                     Serial.print("CO: " + String(m_lastCOValue / 1.0, 1) + " ppm  ");
-                    Serial.print("H2S: " + String(m_lastH2SValue / 1.0, 1) + " ppm  ");
+                    Serial.println("H2S: " + String(m_lastH2SValue / 1.0, 1) + " ppm  ");
                 } else {
-                    Serial.println("Checksum invalid");
                 }
             } else {
-                Serial.println("Invalid data length");
             }
         }
     }
