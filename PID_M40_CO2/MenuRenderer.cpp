@@ -96,7 +96,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
   //m_display->drawXbm(110, 2, 16, 8, battery_bits);
-  m_display->drawString(110, 2, String(v_b)+"%");
+  m_display->drawString(100, 0, String(v_b)+"mV");
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "26C  30%");  // Example placeholder text
