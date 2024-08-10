@@ -45,31 +45,28 @@ void SSD1306GasMenuRenderer::render(Menu* menu)
 }
 
 
-
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Lowalarm* lowalarm, Range* range, Calvalue* calvalue, Outport* outport) : SSD1306MenuRenderer(display),
-  m_dataSource(dataSource),
-  m_gasManager(gasManager),
-  m_alarm(alarm),
-  m_lowalarm(lowalarm),
-  m_range(range),
-  m_calvalue(calvalue),
-  m_outport(outport)
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Lowalarm* lowalarm, Range* range, Calvalue* calvalue, Outport* outport)
+  : SSD1306MenuRenderer(display),
+    m_dataSource(dataSource),
+    m_gasManager(gasManager),
+    m_alarm(alarm),
+    m_lowalarm(lowalarm),
+    m_range(range),
+    m_calvalue(calvalue),
+    m_outport(outport)
 {
-
 }
-//SimpleKalmanFilter simpleKalmanFilter(2, 2, 0.1);
-
 
 void SSD1306RunMenuRenderer::render(Menu* menu)
 {
-  const float multiplier = 0.125F; //GAIN 1
+  const float multiplier = 0.125F; // GAIN 1
   int range = m_range->getSelectedRange();
   int alarm = m_alarm->getSelectedAlarm();
   int lowalarm = m_lowalarm->getSelectedLowalarm();
   int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
-  int v_b = m_dataSource->getRawMiliVolts_battery();
+  int v_b = m_dataSource->getRawMiliVolts_battery(); // Get battery voltage
   Gas& selectedGas = m_gasManager->getSelectedGas();
   static const unsigned char battery_bits[] = {
     0xFE, 0x7F,  // ####### #######
@@ -98,13 +95,11 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110 , 2, 16, 8, battery_bits);
+  //m_display->drawXbm(110, 2, 16, 8, battery_bits);
+  m_display->drawString(110, 2, String(v_b)+"%");
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "26C  30%");
-  //m_display->drawString(64, 0, "CO2");
-
-  //m_display->drawString(114, 0, String(String(v_b * 0.08333 - 250.0, 0) + "%"));
+  m_display->drawString(64, 0, "26C  30%");  // Example placeholder text
   m_display->drawLine(0, 14, 256, 14);
 
   // Check if the reading is above the alarm level
@@ -127,7 +122,9 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(115, 33, "ppm");  // Unit
-  m_display->drawString(12, 28, String(selectedGas.getName()));  // Unit
+  m_display->drawString(12, 28, String(selectedGas.getName()));  // Gas name
+
+  // Display range
   if (range == 10000) {
     m_display->drawString(115, 20, "R10k");
   } else if (range == 5000) {
@@ -135,12 +132,14 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   }
 
   m_display->drawLine(0, 49, 256, 49);
+
+  // Display voltage and battery info
   m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm H");
   }
 
-
+  // Display outport status
   if (outport == 1) {
     Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
     m_display->drawString(114, 51, "USB");
@@ -149,8 +148,6 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->display();
   delay(100);  // Consider adjusting this delay based on your application's requirements
 }
-
-
 ///////////////////////////
 
 SSD1306SleepTimerMenuRenderer::SSD1306SleepTimerMenuRenderer(SSD1306Wire* display, SleepTimer* sleepTimer) : SSD1306MenuRenderer(display),

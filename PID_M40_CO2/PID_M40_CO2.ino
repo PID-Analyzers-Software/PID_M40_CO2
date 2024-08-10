@@ -1,17 +1,5 @@
-
-/*
-   Release Log
-   Save the selected gas index to the EEPROM memory. 3/4/2023
-   Range Selection Added but not implemented in the calculation. 2/28/2023
-   Bluetooth Datalogging added and implemented.
-*/
-
-/* Parts List:
-   Huzzah32
-   ADS1115
-*/
-
 #include <Adafruit_ADS1015.h>
+#include <Adafruit_INA219.h> // Include INA219 library
 #include <SSD1306.h>
 #include <U8g2lib.h>
 #include <Wire.h>
@@ -40,13 +28,9 @@
 #include "inc/image.h"
 #include "inc/LoggingSet.h"
 
-
-
 using namespace std;
 
 #define USE_SSD1306_DISPLAY
-
-//Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 
 #define MAX_SCCM 5000
 
@@ -60,11 +44,11 @@ WebServer g_webServer;
 CompositeMenu* g_mainMenu = nullptr;
 
 Adafruit_ADS1115 ads1115;
+Adafruit_INA219 ina219; // Create INA219 object
 
 #ifdef USE_SSD1306_DISPLAY
 SSD1306 display(0x3c, 23, 22);
 #endif
-
 
 SleepTimer g_sleepTimer;
 
@@ -90,7 +74,6 @@ bool isButtonBeingPressed = false;
 
 void setupWiFi() {
   Serial.print("Setting AP (Access Point)…");
-  // Remove the password parameter, if you want the AP (Access Point) to be open
   WiFi.softAP(ssid, password);
 
   IPAddress IP = WiFi.softAPIP();
@@ -105,18 +88,22 @@ void IRAM_ATTR dummyTouchISR() {}
 void setup() {
   Serial.begin(115200);
   Serial.println("PID M40 v20240622");
+
   // DEEP-SLEEP init
   pinMode(26, OUTPUT);
   digitalWrite(26, HIGH);
-  //esp_sleep_enable_ext1_wakeup(0x8004, ESP_EXT1_WAKEUP_ANY_HIGH);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_12, LOW);
-  // ADC
+
+  // Initialize sensors
   ads1115.begin();
   ads1115.setGain(GAIN_TWOTHIRDS);
 
-  AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115);
+  ina219.begin(); // Initialize INA219 sensor
 
+  // Create DataSource with battery monitoring
+  AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115,&ina219);
   DataSource* dataSource = new DataSource(&g_gasManager, ads1115AnalogSourceInput);
+
 
   // Gas Manager
   g_gasManager.setConfigurationManager(&g_configurationManager);
