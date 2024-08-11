@@ -67,6 +67,8 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
   int v_b = m_dataSource->getRawMiliVolts_battery(); // Get battery voltage
+  int temp = m_dataSource->getTemperature();
+  int humidity = m_dataSource->getHumidity();
   Gas& selectedGas = m_gasManager->getSelectedGas();
   static const unsigned char battery_bits[] = {
     0xFE, 0x7F,  // ####### #######
@@ -96,10 +98,10 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
   //m_display->drawXbm(110, 2, 16, 8, battery_bits);
-  m_display->drawString(100, 0, String(v_b)+"mV");
+  m_display->drawString(100, 0, String(v_b) + "mV");
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "26C  30%");  // Example placeholder text
+  m_display->drawString(64, 0, String(temp) + "C  " + String(humidity) + "%"); // Example placeholder text
   m_display->drawLine(0, 14, 256, 14);
 
   // Check if the reading is above the alarm level

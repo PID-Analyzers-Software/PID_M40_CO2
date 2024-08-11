@@ -4,7 +4,7 @@
 
 class DataSource
 {
-    GasManager*         m_gasManager;
+    GasManager* m_gasManager;
     AnalogSourceInput* m_analogSourceInput;
 
 public:
@@ -28,5 +28,15 @@ public:
     {
         uint16_t miliVolts = m_analogSourceInput->getMiliVolts();
         return m_gasManager->calculateSLM(miliVolts / 1000.0);
+    }
+
+    uint16_t getTemperature() const
+    {
+        return m_analogSourceInput->getTemperature();
+    }
+
+    uint16_t getHumidity() const
+    {
+        return m_analogSourceInput->getHumidity();
     }
 };

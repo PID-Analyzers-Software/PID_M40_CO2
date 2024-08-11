@@ -1,5 +1,6 @@
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h> // Include INA219 library
+#include <Adafruit_SHT4x.h>
 #include <SSD1306.h>
 #include <U8g2lib.h>
 #include <Wire.h>
@@ -45,6 +46,7 @@ CompositeMenu* g_mainMenu = nullptr;
 
 Adafruit_ADS1115 ads1115;
 Adafruit_INA219 ina219; // Create INA219 object
+Adafruit_SHT4x sht4x = Adafruit_SHT4x();
 
 #ifdef USE_SSD1306_DISPLAY
 SSD1306 display(0x3c, 23, 22);
@@ -100,8 +102,17 @@ void setup() {
 
   ina219.begin(); // Initialize INA219 sensor
 
+  if (! sht4x.begin()) {
+    Serial.println("Couldn't find SHT4x");
+    while (1) delay(1);
+  }
+  Serial.println("Found SHT4x sensor");
+  Serial.print("Serial number 0x");
+  Serial.println(sht4x.readSerial(), HEX);
+
+
   // Create DataSource with battery monitoring
-  AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115,&ina219);
+  AnalogSourceInput* ads1115AnalogSourceInput = new ADS1115AnalogSourceInput(&ads1115, &ina219, &sht4x);
   DataSource* dataSource = new DataSource(&g_gasManager, ads1115AnalogSourceInput);
 
 
