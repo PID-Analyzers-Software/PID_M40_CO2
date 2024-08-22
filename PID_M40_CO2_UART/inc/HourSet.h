@@ -5,7 +5,7 @@
 #include "ConfigurationManager.h"
 #include <SSD1306.h>
 #include <Wire.h>
-#include <DS3231M.h> // Include the DS3231M RTC library
+#include <RTClib.h> // Include the RTClib for PCF8563 RTC
 
 class Hour
 {
@@ -18,7 +18,7 @@ class Hour
     U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* m_u8g2;
     SSD1306* m_display;
 
-    DS3231M_Class m_ds3231mRtc;
+    RTC_PCF8563 m_rtc;
 
 
 public:
@@ -45,16 +45,16 @@ public:
             EEPROM.commit();
             Serial.print("Hour saved");
             Serial.println(index);
-            DateTime now = m_ds3231mRtc.now();
-            m_ds3231mRtc.adjust(DateTime(now.year(), now.month(), now.day(), index, now.minute(), now.second()));
 
+            // Get the current time
+            DateTime now = m_rtc.now();
 
+            // Adjust the RTC with the new hour
+            m_rtc.adjust(DateTime(now.year(), now.month(), now.day(), index, now.minute(), now.second()));
         }
 
         return;
     }
-
-
 
     void selectNextHour()
     {

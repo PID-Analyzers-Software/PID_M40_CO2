@@ -1,40 +1,38 @@
 #pragma once
 
+#include <array>
 #include "ConfigurationManager.h"
 #include "Globals.h"
 #include <WiFi.h>
-#include "DS3231M.h"
+#include <RTClib.h>
 
 void NTPTimeSync_Task(void* param);
 
 class TimeSync : public ParamChangeListener
 {
+    String m_wifiSsid;
+    String m_wifiPassword;
 
-	String m_wifiSsid;
-	String m_wifiPassword;
+    RTC_PCF8563 m_rtc;
 
-	DS3231M_Class m_ds3231mRtc;
+    bool m_isNTPSyncRunning = false;
 
-	bool m_isNTPSyncRunning = false;
-
-	TaskHandle_t m_task;
+    TaskHandle_t m_task;
 
 public:
 
-	TimeSync();
-	~TimeSync() = default;
+    TimeSync();
+    ~TimeSync() = default;
 
+    void initTimeFromRTC();
 
-	void initTimeFromRTC();
+    void stopNTPSync();
 
-	void stopNTPSync();
+    void startNTPSync();
 
-	void startNTPSync();
+    bool isNTCSyncRunning() const;  // Declare the missing function
 
-	bool isNTCSyncRunning() const;
+    void NTPSyncTask_run();
 
-	void NTPSyncTask_run();
-
-	void onParamChange(String param, String value);
+    void onParamChange(String param, String value);
 };
-

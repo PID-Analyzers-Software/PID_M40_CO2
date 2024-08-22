@@ -5,6 +5,7 @@
 #include "ConfigurationManager.h"
 #include <SSD1306.h>
 #include <Wire.h>
+#include <RTClib.h>
 
 class Minute
 {
@@ -16,8 +17,7 @@ class Minute
     ConfigurationManager* m_configurationManager;
     U8G2_SSD1327_MIDAS_128X128_F_4W_SW_SPI* m_u8g2;
     SSD1306* m_display;
-    DS3231M_Class m_ds3231mRtc;
-
+    RTC_PCF8563 m_rtc;
 
 public:
 
@@ -43,14 +43,16 @@ public:
             EEPROM.commit();
             Serial.print("Minute saved ");
             Serial.println(index);
-            DateTime now = m_ds3231mRtc.now();
-            m_ds3231mRtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour(), index, now.second()));
+
+            // Get the current time
+            DateTime now = m_rtc.now();
+
+            // Adjust the RTC with the new minute
+            m_rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour(), index, now.second()));
         }
 
         return;
     }
-
-
 
     void selectNextMinute()
     {
@@ -74,5 +76,4 @@ public:
         int minute = EEPROM.read(230);
         return m_minuteArray[minute];
     }
-
 };

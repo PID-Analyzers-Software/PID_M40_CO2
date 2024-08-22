@@ -46,7 +46,7 @@ bool DataLogger::shouldExecTick()
 void DataLogger::handleTick()
 {
 	// Read dataSource here anyway to have fresh value for dataloggers when we're off the RUN menu screen
-	double val = m_dataSource->getDoubleValue();
+	double val = m_dataSource->getCalibratedValue(1);
 
 	bool execTick = shouldExecTick();
 

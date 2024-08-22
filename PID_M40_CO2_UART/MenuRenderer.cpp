@@ -57,89 +57,152 @@ SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(
 
 
 void SSD1306RunMenuRenderer::render(Menu* menu) {
-  const float multiplier = 0.125F; // GAIN 1
-  int range = m_range->getSelectedRange();
-  int alarm = m_alarm->getSelectedAlarm(0);
-  int lowalarm = m_lowalarm->getSelectedLowalarm();
-  int outport = m_outport->getSelectedOutport();
-  int calvalue = m_calvalue->getSelectedCalvalue();
-  int64_t startMicros = esp_timer_get_time();
-  int v_b = m_dataSource->getCH4Value();
-  Gas& selectedGas = m_gasManager->getSelectedGas();
+    const float multiplier = 0.125F; // GAIN 1
+    int range = m_range->getSelectedRange();
+    int alarm = m_alarm->getSelectedAlarm(0);
+    int lowalarm = m_lowalarm->getSelectedLowalarm();
+    int outport = m_outport->getSelectedOutport();
+    int calvalue = m_calvalue->getSelectedCalvalue();
+    int64_t startMicros = esp_timer_get_time();
+    int v_b = 1;
+    Gas& selectedGas = m_gasManager->getSelectedGas();
 
-  // Read all sensor values
-  m_dataSource->readAllValues();
+    // Read all sensor values
+    m_dataSource->readAllValues();
 
-  // Battery icon bits
-  static const unsigned char battery_bits[] = {
-    0xFF, 0x7F,  // ####### #######
-    0x01, 0x80,  // #             #
-    0xFD, 0x87,  // # ####### #####
-    0xFD, 0x87,  // # ####### #####
-    0xFD, 0x87,  // # ####### #####
-    0xFD, 0x87,  // # ####### #####
-    0x01, 0x80,  // #             #
-    0xFF, 0x7F   // ####### #######
-  };
+    // Battery icon bits
+    static const unsigned char battery_bits[] = {
+        0xFF, 0x7F,  // ####### #######
+        0x01, 0x80,  // #             #
+        0xFD, 0x87,  // # ####### #####
+        0xFD, 0x87,  // # ####### #####
+        0xFD, 0x87,  // # ####### #####
+        0xFD, 0x87,  // # ####### #####
+        0x01, 0x80,  // #             #
+        0xFF, 0x7F   // ####### #######
+    };
 
-  // Blinking toggle
-  static bool displayOn = true;
-  static unsigned long lastBlinkTime = 0;
-  const unsigned long blinkInterval = 500; // Blink interval in milliseconds
+    // Blinking toggle
+    static bool displayOn = true;
+    static unsigned long lastBlinkTime = 0;
+    const unsigned long blinkInterval = 1000; // Blink interval in milliseconds
 
-  m_display->clear();
-  m_display->setColor(WHITE);
-  m_display->setTextAlignment(TEXT_ALIGN_LEFT);
-  m_display->setFont(ArialMT_Plain_10);
+    unsigned long currentTime = millis();
+    if (currentTime - lastBlinkTime > blinkInterval) {
+        displayOn = !displayOn;
+        lastBlinkTime = currentTime;
+    }
 
-  // Display date & time
-  struct tm timeinfo;
-  getLocalTime(&timeinfo, 10);
-  char dateString[30] = { 0 };
-  char timeString[30] = { 0 };
-  strftime(dateString, 30, "%b %d %y", &timeinfo);
-  strftime(timeString, 30, "%H:%M", &timeinfo);
-  m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110, 3, 16, 8, battery_bits);
+    bool highAlarmEnabled = true; // Boolean to enable or disable high alarm
+    bool lowAlarmEnabled = false;  // Boolean to enable or disable low alarm
 
-  m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, "ALM H  LOG");
-  m_display->drawLine(0, 14, 128, 14);
-  m_display->drawLine(0, 39, 128, 39);
-  m_display->drawLine(64, 14, 64, 64);
+    m_display->clear();
+    m_display->setColor(WHITE);
+    m_display->setTextAlignment(TEXT_ALIGN_LEFT);
+    m_display->setFont(ArialMT_Plain_10);
 
-  // Check if the reading is above the alarm level
-  bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
+    // Display date & time
+    struct tm timeinfo;
+    getLocalTime(&timeinfo, 10);
+    char dateString[30] = { 0 };
+    char timeString[30] = { 0 };
+    strftime(dateString, 30, "%b %d %y", &timeinfo);
+    strftime(timeString, 30, "%H:%M", &timeinfo);
+    m_display->drawString(0, 0, String(timeString));
+    m_display->drawXbm(110, 3, 16, 8, battery_bits);
 
-  // Display gas concentration values
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(9, 17, "O2"); // Unit
-  m_display->drawString(12, 27, "%VOL"); // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(44, 18, String(m_dataSource->getO2Value() / 10.0, 1));
+    m_display->setTextAlignment(TEXT_ALIGN_CENTER);
+    m_display->drawString(64, 0, "ALM H LOG");
+    m_display->drawLine(0, 14, 128, 14);
+    m_display->drawLine(0, 39, 128, 39);
+    m_display->drawLine(64, 14, 64, 64);
 
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(75, 17, "CO"); // Unit
-  m_display->drawString(75, 27, "ppm"); // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(107, 18, String(m_dataSource->getCOValue()));
+    // Get gas concentration values
+    float o2_value = m_dataSource->getCalibratedValue(2) / 10.0;
+    int co_value = m_dataSource->getCalibratedValue(0);
+    int h2s_value = m_dataSource->getCalibratedValue(1);
+    float ch4_value = m_dataSource->getCalibratedValue(3);
 
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(10, 42, "H2S"); // Unit
-  m_display->drawString(10, 52, "ppm"); // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(44, 44, String(m_dataSource->getH2SValue()));
+    // Alarm thresholds
+    const float o2_high_alarm_threshold = 23.5;
+    const float o2_low_alarm_threshold = 19.5;
+    const int co_high_alarm_threshold = 200;
+    const int co_low_alarm_threshold = 50;
+    const int h2s_high_alarm_threshold = 20;
+    const int h2s_low_alarm_threshold = 10;
+    const float ch4_high_alarm_threshold = 50.0;
+    const float ch4_low_alarm_threshold = 20.0;
 
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(78, 42, "CH4"); // Unit
-  m_display->drawString(79, 53, "%LEL"); // Unit
-  m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(107, 44, String(m_dataSource->getCH4Value()));
+    // Display gas concentration values with high and low alarm blinking
+    m_display->setFont(ArialMT_Plain_10);
+    
+    // O2
+    if (displayOn && ((highAlarmEnabled && o2_value > o2_high_alarm_threshold) || (lowAlarmEnabled && o2_value < o2_low_alarm_threshold))) {
+        m_display->setFont(ArialMT_Plain_16);
+        if (o2_value > o2_high_alarm_threshold) {
+            m_display->drawString(30, 18, "HIGH!");
+        } else if (o2_value < o2_low_alarm_threshold) {
+            m_display->drawString(30, 18, "LOW!");
+        }
+    } else {
+        m_display->setFont(ArialMT_Plain_10);
+        m_display->drawString(9, 17, "O2"); // Unit
+        m_display->drawString(12, 27, "%VOL"); // Unit
+        m_display->setFont(ArialMT_Plain_16);
+        m_display->drawString(44, 18, String(o2_value, 1));
+    }
 
-  m_display->display();
-  delay(100); // Adjust this delay based on your application's requirements
+    // CO
+    if (displayOn && ((highAlarmEnabled && co_value > co_high_alarm_threshold) || (lowAlarmEnabled && co_value < co_low_alarm_threshold))) {
+        m_display->setFont(ArialMT_Plain_16);
+        if (co_value > co_high_alarm_threshold) {
+            m_display->drawString(96, 18, "HIGH!");
+        } else if (co_value < co_low_alarm_threshold) {
+            m_display->drawString(96, 18, "LOW!");
+        }
+    } else {
+        m_display->setFont(ArialMT_Plain_10);
+        m_display->drawString(75, 17, "CO"); // Unit
+        m_display->drawString(75, 27, "ppm"); // Unit
+        m_display->setFont(ArialMT_Plain_16);
+        m_display->drawString(107, 18, String(co_value));
+    }
+
+    // H2S
+    if (displayOn && ((highAlarmEnabled && h2s_value > h2s_high_alarm_threshold) || (lowAlarmEnabled && h2s_value < h2s_low_alarm_threshold))) {
+        m_display->setFont(ArialMT_Plain_16);
+        if (h2s_value > h2s_high_alarm_threshold) {
+            m_display->drawString(30, 43, "HIGH!");
+        } else if (h2s_value < h2s_low_alarm_threshold) {
+            m_display->drawString(30, 43, "LOW!");
+        }
+    } else {
+        m_display->setFont(ArialMT_Plain_10);
+        m_display->drawString(10, 42, "H2S"); // Unit
+        m_display->drawString(10, 52, "ppm"); // Unit
+        m_display->setFont(ArialMT_Plain_16);
+        m_display->drawString(44, 44, String(h2s_value));
+    }
+
+    // CH4
+    if (displayOn && ((highAlarmEnabled && ch4_value > ch4_high_alarm_threshold) || (lowAlarmEnabled && ch4_value < ch4_low_alarm_threshold))) {
+        m_display->setFont(ArialMT_Plain_16);
+        if (ch4_value > ch4_high_alarm_threshold) {
+            m_display->drawString(96, 43, "HIGH!");
+        } else if (ch4_value < ch4_low_alarm_threshold) {
+            m_display->drawString(96, 43, "LOW!");
+        }
+    } else {
+        m_display->setFont(ArialMT_Plain_10);
+        m_display->drawString(78, 42, "CH4"); // Unit
+        m_display->drawString(79, 53, "%LEL"); // Unit
+        m_display->setFont(ArialMT_Plain_16);
+        m_display->drawString(107, 44, String(ch4_value, 1));
+    }
+
+    m_display->display();
+    delay(100); // Adjust this delay based on your application's requirements
 }
-
 ///////////////////
 
 SSD1306SleepTimerMenuRenderer::SSD1306SleepTimerMenuRenderer(SSD1306Wire* display, SleepTimer* sleepTimer) : SSD1306MenuRenderer(display),
@@ -528,7 +591,7 @@ SSD1306ZEROMenuRenderer::SSD1306ZEROMenuRenderer(SSD1306Wire* display, DataSourc
 void SSD1306ZEROMenuRenderer::render(Menu* menu)
 {
   const float multiplier = 0.125F; //GAIN 1
-  double sensor_val = m_dataSource->getDoubleValue();
+  double sensor_val = m_dataSource->getCalibratedValue(1);
   m_display->setFont(ArialMT_Plain_10);
 
   m_display->clear();
@@ -537,7 +600,7 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 21, "“Place ZeroGas on Probe");
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getO2Value()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
@@ -558,7 +621,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getO2Value()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();

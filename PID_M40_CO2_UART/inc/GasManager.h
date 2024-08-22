@@ -218,6 +218,31 @@ public:
 
     Gas& getSelectedGas() { return m_gases[m_selectedGas]; }
 
+    int getSelectedGasIndex() const {
+        return m_selectedGas;
+    }
+
+    double getInterceptByIndex(int index) const {
+        switch (index) {
+            case 0: return m_intercept;
+            case 1: return m_intercept2;
+            case 2: return m_intercept3;
+            case 3: return m_intercept4;
+            default: return 0.0;
+        }
+    }
+
+    double getSlopeByIndex(int index) const {
+        switch (index) {
+            case 0: return m_slope;
+            case 1: return m_slope2;
+            case 2: return m_slope3;
+            case 3: return m_slope4;
+            default: return 1.0;  // Avoid division by zero in calculations
+        }
+    }
+
+
 
     std::vector<Gas>& getAllGases() { return m_gases; }
 

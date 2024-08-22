@@ -443,7 +443,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate(m_dataSource->getO2Value());
+        m_gasManager->calibrate(m_dataSource->getCalibratedValue(1));
     }
 
 };
@@ -466,7 +466,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate2(m_dataSource->getO2Value());
+        m_gasManager->calibrate2(m_dataSource->getCalibratedValue(1));
     }
 
 };
