@@ -21,15 +21,13 @@ public:
     double getCalibratedValue(int gasIndex) const {
         double rawValue = 0.0;
         switch (gasIndex) {
-            case 0: rawValue = m_analogSourceInput->getCOValue(); break;
-            case 1: rawValue = m_analogSourceInput->getH2SValue(); break;
-            case 2: rawValue = m_analogSourceInput->getO2Value(); break;
-            case 3: rawValue = m_analogSourceInput->getCH4Value(); break;
+            case 0: rawValue = m_analogSourceInput->getCOValue(); rawValue *= (5.0 / 7.0); break;
+            case 1: rawValue = m_analogSourceInput->getH2SValue(); rawValue *= (5.0 / 6.0); break;
+            case 2: rawValue = m_analogSourceInput->getO2Value(); break; // Raw value is used directly
+            case 3: rawValue = m_analogSourceInput->getCH4Value(); rawValue *= (50.0 / 38.0); break;
             default: return 0.0;
         }
-        double intercept = m_gasManager->getInterceptByIndex(gasIndex);
-        double slope = m_gasManager->getSlopeByIndex(gasIndex);
-        return rawValue;
+        return rawValue; // Now returns the scaled value directly
     }
 
     // Retrieves the gas value based on the currently selected gas in GasManager
@@ -38,4 +36,3 @@ public:
         return getCalibratedValue(selectedGasIndex);
     }
 };
-
