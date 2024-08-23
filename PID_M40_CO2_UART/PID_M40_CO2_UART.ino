@@ -78,8 +78,8 @@ SSD1306 display(0x3c, 23, 22);
 
 HardwareSerial sensorSerial(1);
 
-const int rxPin = 16; // RX pin for ESP32 (connected to TX of sensor)
-const int txPin = 17; // TX pin for ESP32 (connected to RX of sensor)
+const int rxPin = 25; // RX pin for ESP32 (connected to TX of sensor)
+const int txPin = 26; // TX pin for ESP32 (connected to RX of sensor)
 
 // Create an instance of the UARTAnalogSourceInput class
 UARTAnalogSourceInput uartSourceInput;
