@@ -46,19 +46,27 @@ public:
             uint8_t buffer[9];
             int length = 0;
 
+            Serial.println("Starting CH2O value read...");
+
             // Attempt to read data until we get a valid start byte
             while (true) {
                 if (m_uart->available() >= 1) {
                     uint8_t byte = m_uart->read();
+                    Serial.print("Read byte: 0x");
+                    Serial.println(byte, HEX);
 
                     // Start byte found, read the rest of the data
                     if (byte == 0xFF) {
+                        Serial.println("Start byte found.");
                         buffer[0] = byte;
                         length = m_uart->readBytes(buffer + 1, 8); // Read the remaining bytes
 
                         // Ensure the data is complete
                         if (length == 8) {
+                            Serial.println("Data packet received successfully.");
                             break;
+                        } else {
+                            Serial.println("Incomplete data packet.");
                         }
                     }
                 }
@@ -66,23 +74,24 @@ public:
             }
 
             if (length == 8 && buffer[1] == 0x17) {  // Check the command byte if necessary
+                Serial.println("Valid command byte received.");
                 uint8_t checksum = calculateChecksum(buffer, 9);
 
                 if (checksum == buffer[8]) {  // Verify checksum
                     // Extract CH2O concentration from buffer[2] and buffer[3]
                     m_lastReadValue = (buffer[2] << 8) | buffer[3];
-                    Serial.print("CH2O Value: " + String(m_lastReadValue) + " ppb");
+                    Serial.print("CH2O Value: ");
+                    Serial.print(m_lastReadValue);
+                    Serial.println(" ppb");
                 } else {
-                    Serial.println("Checksum mismatch");
+                    Serial.println("Checksum mismatch.");
                 }
             } else {
-                Serial.println("Data not complete or start byte mismatch");
+                Serial.println("Data not complete or start byte mismatch.");
             }
         }
         return m_lastReadValue;
     }
-
-
 
     float getTemperature() override {
         unsigned long now = millis();
