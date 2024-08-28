@@ -40,59 +40,34 @@ public:
 
     uint16_t getCH2OValue() override {
         unsigned long now = millis();
-        if (now - m_lastReadValueTick > 2000) {  // Adjust timing as necessary
-            m_lastReadValueTick = now;
-
+        if (now - m_lastReadValueTick > 1000) {
+            m_lastReadValueTick = millis();
             uint8_t buffer[9];
-            int length = 0;
+            int bytesRead = 0;
 
-            Serial.println("Starting CH2O value read...");
+            // Attempt to read data from the sensor
+            while (m_uart->available()) {
+                buffer[0] = m_uart->read();
+                if (buffer[0] == 0xFF) {  // Check for start byte
+                    bytesRead = m_uart->readBytes(buffer + 1, 8);  // Read the rest of the packet
+                    if (bytesRead == 8 && buffer[1] == 0x17) {  // Validate the gas type byte (0x17 for CH2O)
+                        // Extract CH2O concentration from buffer[4] (High Byte) and buffer[5] (Low Byte)
+                        uint16_t concentration = (buffer[4] << 8) | buffer[5];
+                        uint8_t checksum = 0xFF - (buffer[1] + buffer[2] + buffer[3] + buffer[4] + buffer[5] + buffer[6] + buffer[7]) + 1;
 
-            // Attempt to read data until we get a valid start byte
-            while (true) {
-                if (m_uart->available() >= 1) {
-                    uint8_t byte = m_uart->read();
-                    Serial.print("Read byte: 0x");
-                    Serial.println(byte, HEX);
-
-                    // Start byte found, read the rest of the data
-                    if (byte == 0xFF) {
-                        Serial.println("Start byte found.");
-                        buffer[0] = byte;
-                        length = m_uart->readBytes(buffer + 1, 8); // Read the remaining bytes
-
-                        // Ensure the data is complete
-                        if (length == 8) {
-                            Serial.println("Data packet received successfully.");
-                            break;
+                        if (checksum == buffer[8]) {  // Validate checksum
+                            m_lastReadValue = concentration;
+                            Serial.print("CH2O Value (ug/m3): ");
+                            Serial.println(m_lastReadValue);
                         } else {
-                            Serial.println("Incomplete data packet.");
+                            Serial.println("Checksum mismatch.");
                         }
                     }
                 }
-                delay(10); // Short delay to avoid busy-waiting
-            }
-
-            if (length == 8 && buffer[1] == 0x17) {  // Check the command byte if necessary
-                Serial.println("Valid command byte received.");
-                uint8_t checksum = calculateChecksum(buffer, 9);
-
-                if (checksum == buffer[8]) {  // Verify checksum
-                    // Extract CH2O concentration from buffer[2] and buffer[3]
-                    m_lastReadValue = (buffer[2] << 8) | buffer[3];
-                    Serial.print("CH2O Value: ");
-                    Serial.print(m_lastReadValue);
-                    Serial.println(" ppb");
-                } else {
-                    Serial.println("Checksum mismatch.");
-                }
-            } else {
-                Serial.println("Data not complete or start byte mismatch.");
             }
         }
         return m_lastReadValue;
     }
-
     float getTemperature() override {
         unsigned long now = millis();
         if (now - m_lastReadValueTick_rht > 1000 / m_refreshRate_rht) {

@@ -98,7 +98,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
   //m_display->drawXbm(110, 2, 16, 8, battery_bits);
-  m_display->drawString(100, 0, String(v_b/1000.0,1) + "V");
+  m_display->drawString(100, 0, String(v_b / 1000.0, 1) + "V");
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, String(temp) + "C  " + String(humidity) + "%"); // Example placeholder text
@@ -107,24 +107,14 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   // Check if the reading is above the alarm level
   bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
 
-  if (isAboveAlarm && alarm != 0) {
-    unsigned long currentTime = millis();
-    if (currentTime - lastBlinkTime > blinkInterval) {
-      displayOn = !displayOn;  // Toggle the display state
-      lastBlinkTime = currentTime;
-    }
-    if (displayOn) {
-      m_display->setFont(ArialMT_Plain_24);
-      m_display->drawString(60, 18, "ALARM");
-    }
-  } else {
-    m_display->setFont(ArialMT_Plain_24);
-    m_display->drawString(60, 18, String(m_dataSource->getDoubleValue(), 1));
-  }
+
+  m_display->setFont(ArialMT_Plain_24);
+  m_display->drawString(60, 18, String((m_dataSource->getDoubleValue())/1000.0, 1));
+
 
   m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(115, 33, "ppm");  // Unit
-  m_display->drawString(12, 28, String(selectedGas.getName()));  // Gas name
+  m_display->drawString(112, 33, "mg/m3");  // Unit
+  m_display->drawString(14, 28, "CH2O");  // Gas name
 
   // Display range
   if (range == 10000) {
@@ -136,7 +126,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   m_display->drawLine(0, 49, 256, 49);
 
   // Display voltage and battery info
-  m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "mV"));
+  m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "ug/m3"));
   if (alarm != 0) {
     m_display->drawString(12, 51, "Alm H");
   }
