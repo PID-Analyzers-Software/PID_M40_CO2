@@ -97,8 +97,8 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
-  //m_display->drawXbm(110, 2, 16, 8, battery_bits);
-  m_display->drawString(100, 0, String(v_b / 1000.0, 1) + "V");
+  m_display->drawXbm(110, 2, 16, 8, battery_bits);
+  //m_display->drawString(100, 0, String(v_b / 1000.0, 1) + "V");
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, String(temp) + "C  " + String(humidity) + "%"); // Example placeholder text
@@ -109,7 +109,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
 
 
   m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(60, 18, String((m_dataSource->getDoubleValue())/1000.0, 1));
+  m_display->drawString(60, 18, String((m_dataSource->getDoubleValue())/1000.0, 3));
 
 
   m_display->setFont(ArialMT_Plain_10);
