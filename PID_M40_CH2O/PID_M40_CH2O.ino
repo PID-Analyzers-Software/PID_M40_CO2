@@ -59,6 +59,9 @@ HardwareSerial sensorSerial(1);
 
 const int rxPin = 25; // RX pin for ESP32 (connected to TX of sensor)
 const int txPin = 26; // TX pin for ESP32 (connected to RX of sensor)
+//const int rxPin = 16; // RX pin for ESP32 (connected to TX of sensor)
+//const int txPin = 17; // TX pin for ESP32 (connected to RX of sensor)
+
 
 // Create an instance of the UARTAnalogSourceInput class
 // UARTAnalogSourceInput uartSourceInput;
@@ -116,7 +119,6 @@ void setup() {
 
   if (! sht4x.begin()) {
     Serial.println("Couldn't find SHT4x");
-    while (1) delay(1);
   }
   Serial.println("Found SHT4x sensor");
   Serial.print("Serial number 0x");

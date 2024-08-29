@@ -75,6 +75,7 @@ public:
             sensors_event_t humidity, temp;
             m_sht4x->getEvent(&humidity, &temp);
             m_lastTemperature = temp.temperature;
+            m_lastHumidity = humidity.relative_humidity;
         }
         return m_lastTemperature;
     }
