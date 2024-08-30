@@ -1,11 +1,23 @@
+
+/*
+   Release Log
+   Save the selected gas index to the EEPROM memory. 3/4/2023
+   Range Selection Added but not implemented in the calculation. 2/28/2023
+   Bluetooth Datalogging added and implemented.
+*/
+
+/* Parts List:
+   Huzzah32
+   ADS1115
+*/
+
 #include <Adafruit_ADS1015.h>
-#include <Adafruit_INA219.h> // Include INA219 library
-#include <Adafruit_SHT4x.h>
 #include <SSD1306.h>
 #include <U8g2lib.h>
 #include <Wire.h>
 #include <WiFi.h>
 #include <vector>
+#include <Arduino.h>
 #include <HardwareSerial.h>
 
 #include "inc/TimeSync.h"
@@ -30,14 +42,25 @@
 #include "inc/image.h"
 #include "inc/LoggingSet.h"
 
+
+
 using namespace std;
 
 #define USE_SSD1306_DISPLAY
+
+//Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 
 #define MAX_SCCM 5000
 
 #define wifi_ssid "22CDPro"
 #define wifi_password "00525508"
+
+
+#define GAS_INDEX_CO 0
+#define GAS_INDEX_H2S 1
+#define GAS_INDEX_O2 2
+#define GAS_INDEX_CH4 3
+
 
 GasManager g_gasManager(-2.054456771, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -46,8 +69,6 @@ WebServer g_webServer;
 CompositeMenu* g_mainMenu = nullptr;
 
 Adafruit_ADS1115 ads1115;
-Adafruit_INA219 ina219; // Create INA219 object
-Adafruit_SHT4x sht4x = Adafruit_SHT4x();
 
 #ifdef USE_SSD1306_DISPLAY
 SSD1306 display(0x3c, 23, 22);
@@ -59,12 +80,9 @@ HardwareSerial sensorSerial(1);
 
 const int rxPin = 25; // RX pin for ESP32 (connected to TX of sensor)
 const int txPin = 26; // TX pin for ESP32 (connected to RX of sensor)
-//const int rxPin = 16; // RX pin for ESP32 (connected to TX of sensor)
-//const int txPin = 17; // TX pin for ESP32 (connected to RX of sensor)
-
 
 // Create an instance of the UARTAnalogSourceInput class
-// UARTAnalogSourceInput uartSourceInput;
+UARTAnalogSourceInput uartSourceInput;
 
 
 SleepTimer g_sleepTimer;
@@ -91,6 +109,7 @@ bool isButtonBeingPressed = false;
 
 void setupWiFi() {
   Serial.print("Setting AP (Access Point)…");
+  // Remove the password parameter, if you want the AP (Access Point) to be open
   WiFi.softAP(ssid, password);
 
   IPAddress IP = WiFi.softAPIP();
@@ -105,40 +124,30 @@ void IRAM_ATTR dummyTouchISR() {}
 void setup() {
   Serial.begin(115200);
   Serial.println("PID M40 v20240622");
-
   // DEEP-SLEEP init
   pinMode(26, OUTPUT);
   digitalWrite(26, HIGH);
+  //esp_sleep_enable_ext1_wakeup(0x8004, ESP_EXT1_WAKEUP_ANY_HIGH);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_12, LOW);
 
-  // Initialize sensors
+  // ADC
   ads1115.begin();
   ads1115.setGain(GAIN_TWOTHIRDS);
-
-  ina219.begin(); // Initialize INA219 sensor
-
-  if (! sht4x.begin()) {
-    Serial.println("Couldn't find SHT4x");
-  }
-  Serial.println("Found SHT4x sensor");
-  Serial.print("Serial number 0x");
-  Serial.println(sht4x.readSerial(), HEX);
 
   // Initialize the sensor serial port
   sensorSerial.begin(9600, SERIAL_8N1, rxPin, txPin);
 
-  // Correctly create an instance of UARTAnalogSourceInput with required arguments
-  AnalogSourceInput* uartAnalogSourceInput = new UARTAnalogSourceInput(&sensorSerial, &ina219, &sht4x);
-  DataSource* dataSource = new DataSource(&g_gasManager, uartAnalogSourceInput);
+  AnalogSourceInput* uartAnalogSourceInput = new UARTAnalogSourceInput();
 
+  DataSource* dataSource = new DataSource(&g_gasManager, uartAnalogSourceInput);
 
   // Gas Manager
   g_gasManager.setConfigurationManager(&g_configurationManager);
 
-  g_gasManager.addGas(Gas("CO2", 1.0));
-  g_gasManager.addGas(Gas("H2S", 1.0));
   g_gasManager.addGas(Gas("CO", 1.0));
-  g_gasManager.addGas(Gas("O2", 5.73));
+  g_gasManager.addGas(Gas("H2S", 1.0));
+  g_gasManager.addGas(Gas("O2", 1.0));
+  g_gasManager.addGas(Gas("CH4", 5.73));
   g_gasManager.addGas(Gas("H2", 6.84));
   g_gasManager.addGas(Gas("ArCH4", 0.85));
   //
@@ -194,10 +203,10 @@ void setup() {
   vector<Menu*> gasMenus;
 
 
-  gasMenus.push_back(new GasMenuItem("CO2", "LIBRARY",  0, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("CO", "LIBRARY",  0, &g_gasManager, gasMenuRenderer));
   gasMenus.push_back(new GasMenuItem("H2S", "LIBRARY", 1, &g_gasManager, gasMenuRenderer));
-  gasMenus.push_back(new GasMenuItem("CO", "LIBRARY", 2, &g_gasManager, gasMenuRenderer));
-  gasMenus.push_back(new GasMenuItem("O2", "LIBRARY",  3, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("O2", "LIBRARY", 2, &g_gasManager, gasMenuRenderer));
+  gasMenus.push_back(new GasMenuItem("CH4", "LIBRARY",  3, &g_gasManager, gasMenuRenderer));
   // gasMenus.push_back(new GasMenuItem("DET 5", "LIBRARY", 4, &g_gasManager, gasMenuRenderer));
   //  gasMenus.push_back(new GasMenuItem("DET 6", "LIBRARY", 5, &g_gasManager, gasMenuRenderer));
 
@@ -228,18 +237,67 @@ void setup() {
 
 
   // Alarm Menus
-  vector<Menu*> alarmMenus;
+  // Alarm Menus for CO
+  vector<Menu*> coAlarmMenus;
   for (int i = 0; i <= 61; i++) {
     int ppm = 475 + i * 25;
-    String label = "High Alarm";
+    String label = "CO High Alarm";
     if (ppm == 475) {
-      alarmMenus.push_back(new AlarmMenuItem("Off", label, i, &g_alarm, alarmMenuRenderer));
+      coAlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_CO, &g_alarm, alarmMenuRenderer));
     } else {
-      alarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, &g_alarm, alarmMenuRenderer));
+      coAlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_CO, &g_alarm, alarmMenuRenderer));
     }
   }
+  CompositeMenu* coAlarmMenu = new CompositeMenu("CO Alarm", "Main Menu", coAlarmMenus);
 
-  CompositeMenu* alarmMenu = new CompositeMenu("Alarm", "Main Menu" , alarmMenus);
+  // Alarm Menus for H2S
+  vector<Menu*> h2sAlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "H2S High Alarm";
+    if (ppm == 475) {
+      h2sAlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_H2S, &g_alarm, alarmMenuRenderer));
+    } else {
+      h2sAlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_H2S, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* h2sAlarmMenu = new CompositeMenu("H2S Alarm", "Main Menu", h2sAlarmMenus);
+
+  // Alarm Menus for O2
+  vector<Menu*> o2AlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "O2 High Alarm";
+    if (ppm == 475) {
+      o2AlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_O2, &g_alarm, alarmMenuRenderer));
+    } else {
+      o2AlarmMenus.push_back(new AlarmMenuItem(String(ppm / 10.0) + " %VOL", label, i, GAS_INDEX_O2, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* o2AlarmMenu = new CompositeMenu("O2 Alarm", "Main Menu", o2AlarmMenus);
+
+  // Alarm Menus for CH4
+  vector<Menu*> ch4AlarmMenus;
+  for (int i = 0; i <= 61; i++) {
+    int ppm = 475 + i * 25;
+    String label = "CH4 High Alarm";
+    if (ppm == 475) {
+      ch4AlarmMenus.push_back(new AlarmMenuItem("Off", label, i, GAS_INDEX_CH4, &g_alarm, alarmMenuRenderer));
+    } else {
+      ch4AlarmMenus.push_back(new AlarmMenuItem(String(ppm) + " ppm", label, i, GAS_INDEX_CH4, &g_alarm, alarmMenuRenderer));
+    }
+  }
+  CompositeMenu* ch4AlarmMenu = new CompositeMenu("CH4 Alarm", "Main Menu", ch4AlarmMenus);
+
+  // Add all alarm menus to the main menu
+  vector<Menu*> mainMenus;
+  mainMenus.push_back(coAlarmMenu);
+  mainMenus.push_back(h2sAlarmMenu);
+  mainMenus.push_back(o2AlarmMenu);
+  mainMenus.push_back(ch4AlarmMenu);
+
+  CompositeMenu* mainMenu = new CompositeMenu("Main Menu", "", mainMenus);
+
 
 
   // Low Alarm Menus
@@ -358,7 +416,7 @@ void setup() {
   horizontalMenus.push_back(libraryMenu);
 
   //horizontalMenus.push_back(dateTimeMenu);
-  horizontalMenus.push_back(alarmMenu);
+  horizontalMenus.push_back(coAlarmMenu);
   horizontalMenus.push_back(lowalarmMenu);
   horizontalMenus.push_back(loggingsetMenu);
 
@@ -400,8 +458,11 @@ void setup() {
   g_timeSync.initTimeFromRTC();
   int range = EEPROM.read(72);
   g_range.selectRangeByIndex(range);
-  int alarm = EEPROM.read(76);
-  g_alarm.selectAlarmByIndex(alarm);
+  for (int gasIndex = 0; gasIndex < 4; gasIndex++) {
+    int alarmAddress = 96 + (gasIndex * 4);
+    int alarm = EEPROM.read(alarmAddress);
+    g_alarm.selectAlarmByIndex(gasIndex, alarm);
+  }
   int lowalarm = EEPROM.read(92);
   g_lowalarm.selectLowalarmByIndex(lowalarm);
 }

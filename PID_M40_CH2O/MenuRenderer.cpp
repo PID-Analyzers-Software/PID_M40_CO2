@@ -1,3 +1,4 @@
+// MenuRenderer.cpp
 #include "inc/MenuRenderer.h"
 #include "inc/Menu.h"
 #include "inc/SleepTimer.h"
@@ -5,7 +6,6 @@
 #include "inc/RangeSet.h"
 #include "inc/AlarmSet.h"
 #include "inc/LowAlarmSet.h"
-
 #include "inc/HourSet.h"
 #include "inc/MinuteSet.h"
 #include "inc/CalvalueSet.h"
@@ -16,80 +16,92 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 
+// Constructor for SSD1306GasMenuRenderer
+SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display) {}
 
-
-SSD1306GasMenuRenderer::SSD1306GasMenuRenderer(SSD1306Wire* display) : SSD1306MenuRenderer(display)
-
-{
-
-
-}
-
-void SSD1306GasMenuRenderer::render(Menu* menu)
-{
+void SSD1306GasMenuRenderer::render(Menu* menu) {
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Gas Selection");
   m_display->drawLine(0, 16, 256, 16);
   m_display->setFont(ArialMT_Plain_16);
-  m_display->drawString(60, 24 , menu->getName());
+  m_display->drawString(60, 24, menu->getName());
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(12, 51, "Up");
   m_display->drawString(63, 51, "Enter");
   m_display->drawString(113, 51, "Next");
   m_display->drawLine(0, 49, 256, 49);
-
   m_display->setFont(ArialMT_Plain_10);
   m_display->display();
 }
 
+// Constructor for SSD1306RunMenuRenderer
+SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(
+  SSD1306Wire* display,
+  DataSource* dataSource,
+  GasManager* gasManager,
+  Alarm* alarm,
+  Lowalarm* lowalarm,
+  Range* range,
+  Calvalue* calvalue,
+  Outport* outport
+) : SSD1306MenuRenderer(display),
+  m_dataSource(dataSource),
+  m_gasManager(gasManager),
+  m_alarm(alarm),
+  m_lowalarm(lowalarm),
+  m_range(range),
+  m_calvalue(calvalue),
+  m_outport(outport) {}
 
-SSD1306RunMenuRenderer::SSD1306RunMenuRenderer(SSD1306Wire* display, DataSource* dataSource, GasManager* gasManager, Alarm* alarm, Lowalarm* lowalarm, Range* range, Calvalue* calvalue, Outport* outport)
-  : SSD1306MenuRenderer(display),
-    m_dataSource(dataSource),
-    m_gasManager(gasManager),
-    m_alarm(alarm),
-    m_lowalarm(lowalarm),
-    m_range(range),
-    m_calvalue(calvalue),
-    m_outport(outport)
-{
-}
 
-void SSD1306RunMenuRenderer::render(Menu* menu)
-{
+void SSD1306RunMenuRenderer::render(Menu* menu) {
   const float multiplier = 0.125F; // GAIN 1
   int range = m_range->getSelectedRange();
-  int alarm = m_alarm->getSelectedAlarm();
+  int alarm = m_alarm->getSelectedAlarm(0);
   int lowalarm = m_lowalarm->getSelectedLowalarm();
   int outport = m_outport->getSelectedOutport();
   int calvalue = m_calvalue->getSelectedCalvalue();
   int64_t startMicros = esp_timer_get_time();
-  int v_b = m_dataSource->getRawMiliVolts_battery(); // Get battery voltage
-  int temp = m_dataSource->getTemperature();
-  int humidity = m_dataSource->getHumidity();
+  int v_b = 1;
   Gas& selectedGas = m_gasManager->getSelectedGas();
+
+  // Read all sensor values
+  m_dataSource->readAllValues();
+
+  // Battery icon bits
   static const unsigned char battery_bits[] = {
-    0xFE, 0x7F,  // ####### #######
+    0xFF, 0x7F,  // ####### #######
     0x01, 0x80,  // #             #
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
-    0xFD, 0xBF,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
+    0xFD, 0x87,  // # ####### #####
     0x01, 0x80,  // #             #
-    0xFE, 0x7F   // ####### #######
+    0xFF, 0x7F   // ####### #######
   };
-  static bool displayOn = true;  // Toggle for blinking
+
+  // Blinking toggle
+  static bool displayOn = true;
   static unsigned long lastBlinkTime = 0;
-  const unsigned long blinkInterval = 500;  // Blink interval in milliseconds
+  const unsigned long blinkInterval = 1000; // Blink interval in milliseconds
+
+  unsigned long currentTime = millis();
+  if (currentTime - lastBlinkTime > blinkInterval) {
+    displayOn = !displayOn;
+    lastBlinkTime = currentTime;
+  }
+
+  bool highAlarmEnabled = true; // Boolean to enable or disable high alarm
+  bool lowAlarmEnabled = false;  // Boolean to enable or disable low alarm
 
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_LEFT);
   m_display->setFont(ArialMT_Plain_10);
 
-  // Date & Time
+  // Display date & time
   struct tm timeinfo;
   getLocalTime(&timeinfo, 10);
   char dateString[30] = { 0 };
@@ -97,50 +109,48 @@ void SSD1306RunMenuRenderer::render(Menu* menu)
   strftime(dateString, 30, "%b %d %y", &timeinfo);
   strftime(timeString, 30, "%H:%M", &timeinfo);
   m_display->drawString(0, 0, String(timeString));
-  m_display->drawXbm(110, 2, 16, 8, battery_bits);
-  //m_display->drawString(100, 0, String(v_b / 1000.0, 1) + "V");
+  m_display->drawXbm(110, 3, 16, 8, battery_bits);
 
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
-  m_display->drawString(64, 0, String(temp) + "C  " + String(humidity) + "%"); // Example placeholder text
+  m_display->drawString(64, 0, "ALM H LOG");
   m_display->drawLine(0, 14, 256, 14);
-
-  // Check if the reading is above the alarm level
-  bool isAboveAlarm = m_dataSource->getDoubleValue() > alarm;
-
-
-  m_display->setFont(ArialMT_Plain_24);
-  m_display->drawString(60, 18, String((m_dataSource->getDoubleValue())/1000.0, 3));
-
-
-  m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(112, 33, "mg/m3");  // Unit
-  m_display->drawString(14, 28, "CH2O");  // Gas name
-
-  // Display range
-  if (range == 10000) {
-    m_display->drawString(115, 20, "R10k");
-  } else if (range == 5000) {
-    m_display->drawString(115, 20, "R5k");
-  }
-
   m_display->drawLine(0, 49, 256, 49);
 
-  // Display voltage and battery info
-  m_display->drawString(64, 51, String(String(m_dataSource->getRawMiliVolts()) + "ug/m3"));
-  if (alarm != 0) {
-    m_display->drawString(12, 51, "Alm H");
+
+  // Get gas concentration values
+  int CH2O_value = m_dataSource->getCalibratedValue(0);
+
+  // Alarm thresholds
+  const int CH2O_high_alarm_threshold = 1000;
+  const int CH2O_low_alarm_threshold = 19;
+
+  m_display->setFont(ArialMT_Plain_24);
+
+  // Display gas concentration values with high and low alarm blinking
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(112, 33, "ug/m3");  // Unit
+
+  m_display->drawString(14, 28, "CH2O");  // Gas name
+
+
+  // CH2O
+  if (displayOn && ((highAlarmEnabled && CH2O_value > CH2O_high_alarm_threshold) || (lowAlarmEnabled && CH2O_value < CH2O_low_alarm_threshold))) {
+    m_display->setFont(ArialMT_Plain_24);
+    if (CH2O_value > CH2O_high_alarm_threshold) {
+      m_display->drawString(64, 18, "HIGH");
+    } else if (CH2O_value < CH2O_low_alarm_threshold) {
+      m_display->drawString(64, 18, "LOW");
+    }
+  } else {
+    m_display->setFont(ArialMT_Plain_24);
+    m_display->drawString(64, 18, String(CH2O_value));
   }
 
-  // Display outport status
-  if (outport == 1) {
-    Serial.print((String(m_dataSource->getDoubleValue(), 0) + ",ppm," + String(m_dataSource->getRawMiliVolts()) + "mV," + String(range) + "rg\n").c_str());
-    m_display->drawString(114, 51, "USB");
-  }
 
   m_display->display();
-  delay(100);  // Consider adjusting this delay based on your application's requirements
+  delay(100); // Adjust this delay based on your application's requirements
 }
-///////////////////////////
+///////////////////
 
 SSD1306SleepTimerMenuRenderer::SSD1306SleepTimerMenuRenderer(SSD1306Wire* display, SleepTimer* sleepTimer) : SSD1306MenuRenderer(display),
   m_sleepTimer(sleepTimer)
@@ -199,7 +209,7 @@ SSD1306AlarmMenuRenderer::SSD1306AlarmMenuRenderer(SSD1306Wire* display, Alarm* 
 
 void SSD1306AlarmMenuRenderer::render(Menu* menu)
 {
-  int alarm = m_alarm->getSelectedAlarm();
+  int alarm = m_alarm->getSelectedAlarm(0);
   m_display->clear();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
@@ -528,7 +538,8 @@ SSD1306ZEROMenuRenderer::SSD1306ZEROMenuRenderer(SSD1306Wire* display, DataSourc
 void SSD1306ZEROMenuRenderer::render(Menu* menu)
 {
   const float multiplier = 0.125F; //GAIN 1
-  double sensor_val = m_dataSource->getDoubleValue();
+  double sensor_val = m_dataSource->getCalibratedValue(1);
+  m_display->setFont(ArialMT_Plain_10);
 
   m_display->clear();
   m_display->setColor(WHITE);
@@ -536,7 +547,7 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 21, "“Place ZeroGas on Probe");
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
@@ -557,7 +568,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getRawMiliVolts()) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();

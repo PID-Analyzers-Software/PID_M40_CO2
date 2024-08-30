@@ -39,8 +39,8 @@ public:
         if(index >= 0 && index < m_minuteArray.size())
         {
             m_selectedMinute = index;
-//            EEPROM.writeInt(230, index);
-//            EEPROM.commit();
+            EEPROM.writeInt(230, index);
+            EEPROM.commit();
             Serial.print("Minute saved ");
             Serial.println(index);
 
@@ -73,7 +73,7 @@ public:
     }
 
     int getSelectedMinute() {
-        //int minute = EEPROM.read(230);
-        //return m_minuteArray[minute];
+        int minute = EEPROM.read(230);
+        return m_minuteArray[minute];
     }
 };

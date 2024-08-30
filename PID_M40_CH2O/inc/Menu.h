@@ -146,25 +146,17 @@ public:
 
 };
 
-class AlarmMenuItem : public Menu
-{
+class AlarmMenuItem : public Menu {
     Alarm* m_alarm;
-
     int m_alarmIndex;
+    int m_gasIndex;
 
 public:
+    AlarmMenuItem(String name, String parentName, int alarmIndex, int gasIndex, Alarm* alarm, MenuRenderer* renderer)
+            : Menu(name, parentName, renderer), m_alarm(alarm), m_alarmIndex(alarmIndex), m_gasIndex(gasIndex) {}
 
-    AlarmMenuItem(String name, String parentName, int alarmIndex, Alarm* alarm, MenuRenderer* renderer)
-            : Menu(name, parentName, renderer),
-              m_alarm(alarm),
-              m_alarmIndex(alarmIndex)
-    {
-
-    }
-
-    void action()
-    {
-        m_alarm->selectAlarmByIndex(m_alarmIndex);
+    void action() {
+        m_alarm->selectAlarmByIndex(m_gasIndex, m_alarmIndex);
     }
 };
 
@@ -451,7 +443,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate(m_dataSource->getRawMiliVolts());
+        m_gasManager->calibrate(m_dataSource->getCalibratedValue(1));
     }
 
 };
@@ -474,7 +466,7 @@ public:
 
     void action()
     {
-        m_gasManager->calibrate2(m_dataSource->getRawMiliVolts());
+        m_gasManager->calibrate2(m_dataSource->getCalibratedValue(1));
     }
 
 };

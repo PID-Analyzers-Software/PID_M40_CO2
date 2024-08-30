@@ -1,96 +1,88 @@
 #pragma once
+#include <HardwareSerial.h>
+#define DATA_LENGTH 11
+#define START_BYTE 0xFF
 
-#include <Adafruit_ADS1015.h>
-#include <Adafruit_INA219.h>
-#include <Adafruit_SHT4x.h>
-#include <HardwareSerial.h>  // Include for UART communication
+// External declaration of the HardwareSerial object for UART readings
+extern HardwareSerial sensorSerial;
 
+// Base class for analog source input
 class AnalogSourceInput {
 protected:
-    int m_refreshRate = 2;  // refreshes per second for ADS1115
-    unsigned long m_lastReadValueTick = -5000000;
-    int m_refreshRate_b = 1;  // refreshes per second for INA219
-    unsigned long m_lastReadValueTick_b = -5000000;
-    int m_refreshRate_rht = 1;  // refreshes per second for SHT4x (i.e., every 2 seconds)
-    unsigned long m_lastReadValueTick_rht = -5000000;
-    uint16_t m_lastReadValue;
-    uint16_t m_lastReadValue_battery;
-    float m_lastTemperature;
-    float m_lastHumidity;
+    unsigned long m_lastReadValueTick = -5000000; // Last read value timestamp
+    uint16_t m_lastCH2OValue; // Last read O2 value
+    uint16_t m_lastCH4Value; // Last read CH4 value
+    uint16_t m_lastCOValue; // Last read CO value
+    uint16_t m_lastH2SValue; // Last read H2S value
 
 public:
-    virtual uint16_t getCH2OValue() = 0;  // Method to get CH2O concentration
-    virtual float getTemperature() = 0;   // Method to get temperature from SHT4x
-    virtual float getHumidity() = 0;      // Method to get humidity from SHT4x
+    // Pure virtual function for getting millivolt values
+    virtual void readAllValues() = 0;
+
+    virtual uint16_t getO2Value() const { return m_lastCH2OValue; }
+    virtual uint16_t getCH4Value() const { return m_lastCH2OValue; }
+    virtual uint16_t getCOValue() const { return m_lastCH2OValue; }
+    virtual uint16_t getH2SValue() const { return m_lastCH2OValue; }
+
     virtual ~AnalogSourceInput() = default;
 };
 
+// Derived class for UART analog source input
+// Derived class for UART analog source input
 class UARTAnalogSourceInput : public AnalogSourceInput {
-    HardwareSerial* m_uart;
-    Adafruit_INA219* m_ina219;
-    Adafruit_SHT4x* m_sht4x;
-
 public:
-    UARTAnalogSourceInput(HardwareSerial* uart, Adafruit_INA219* ina219, Adafruit_SHT4x* sht4x)
-            : m_uart(uart), m_ina219(ina219), m_sht4x(sht4x) {
-        m_uart->begin(9600);  // Initialize UART for the Winsen sensor
-    }
-
+    UARTAnalogSourceInput() = default;
     ~UARTAnalogSourceInput() = default;
 
-    uint16_t getCH2OValue() override {
+    // Override function to read all values
+    void readAllValues() override {
         unsigned long now = millis();
-        if (now - m_lastReadValueTick > 1000) {
-            m_lastReadValueTick = millis();
-            uint8_t buffer[9];
-            int bytesRead = 0;
+        if (now - m_lastReadValueTick > 2000) { // Read every 2 seconds
+            m_lastReadValueTick = now;
 
-            // Attempt to read data from the sensor
-            while (m_uart->available()) {
-                buffer[0] = m_uart->read();
-                if (buffer[0] == 0xFF) {  // Check for start byte
-                    bytesRead = m_uart->readBytes(buffer + 1, 8);  // Read the rest of the packet
-                    if (bytesRead == 8 && buffer[1] == 0x17) {  // Validate the gas type byte (0x17 for CH2O)
-                        // Extract CH2O concentration from buffer[4] (High Byte) and buffer[5] (Low Byte)
-                        uint16_t concentration = (buffer[4] << 8) | buffer[5];
-                        uint8_t checksum = 0xFF - (buffer[1] + buffer[2] + buffer[3] + buffer[4] + buffer[5] + buffer[6] + buffer[7]) + 1;
+            uint8_t rawData[9];
+            int length = 0;
 
-                        if (checksum == buffer[8]) {  // Validate checksum
-                            m_lastReadValue = concentration;
-                            Serial.print("CH2O Value (ug/m3): ");
-                            Serial.println(m_lastReadValue);
-                        } else {
-                            Serial.println("Checksum mismatch.");
+            // Attempt to read data until we get a valid start byte
+            while (true) {
+                if (sensorSerial.available() >= 1) {
+                    uint8_t byte = sensorSerial.read();
+
+                    // Start byte found, read the rest of the data
+                    if (byte == 0xFF) {
+                        rawData[0] = byte;
+                        length = sensorSerial.readBytes(rawData + 1, 8);
+
+                        // Ensure the data is complete
+                        if (length == 8) {
+                            break;
                         }
                     }
                 }
+                delay(10); // Short delay to avoid busy-waiting
+            }
+
+            if (length == 8) {
+                uint8_t checksum = 0;
+                for (int i = 1; i < 8; i++) {
+                    checksum += rawData[i];
+                }
+                checksum = (~checksum) + 1;
+
+                if (checksum == rawData[8]) { // Validate checksum
+                    uint16_t concentration = (rawData[4] << 8) | rawData[5];
+                    m_lastCH2OValue = concentration;
+
+                    // Print CH2O value for debugging
+                    Serial.print("CH2O: ");
+                    Serial.print(m_lastCH2OValue);
+                    Serial.println(" ug/m3");
+                } else {
+                    Serial.println("Checksum mismatch.");
+                }
+            } else {
+                Serial.println("Incomplete data received.");
             }
         }
-        return m_lastReadValue;
-    }
-    float getTemperature() override {
-        unsigned long now = millis();
-        if (now - m_lastReadValueTick_rht > 1000 / m_refreshRate_rht) {
-            m_lastReadValueTick_rht = now;
-            sensors_event_t humidity, temp;
-            m_sht4x->getEvent(&humidity, &temp);
-            m_lastTemperature = temp.temperature;
-            m_lastHumidity = humidity.relative_humidity;
-        }
-        return m_lastTemperature;
-    }
-
-    float getHumidity() override {
-        getTemperature();  // Temperature and humidity are read together
-        return m_lastHumidity;
-    }
-
-private:
-    uint8_t calculateChecksum(uint8_t* buffer, size_t length) {
-        uint8_t checksum = 0;
-        for (size_t i = 0; i < length - 1; ++i) {
-            checksum += buffer[i];
-        }
-        return ~checksum + 1;
     }
 };

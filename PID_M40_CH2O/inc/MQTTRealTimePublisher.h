@@ -154,7 +154,7 @@ public:
 			StaticJsonDocument<128> doc;
 
 			// Read sensor value!
-			double val = m_dataSource->getDoubleValue();
+			double val = m_dataSource->getCalibratedValue(1);
 
 			struct timeval tv;
 			gettimeofday(&tv, NULL);
