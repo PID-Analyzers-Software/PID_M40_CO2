@@ -118,7 +118,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
 
 
   // Get gas concentration values
-  int CH2O_value = m_dataSource->getCalibratedValue(0);
+  int CH2O_value = m_dataSource->getCalibratedValue(2);
 
   // Alarm thresholds
   const int CH2O_high_alarm_threshold = 1000;

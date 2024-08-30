@@ -10,7 +10,7 @@ extern HardwareSerial sensorSerial;
 class AnalogSourceInput {
 protected:
     unsigned long m_lastReadValueTick = -5000000; // Last read value timestamp
-    uint16_t m_lastCH2OValue; // Last read O2 value
+    uint16_t m_lastCH2OValue; // Last read CH2O value
     uint16_t m_lastCH4Value; // Last read CH4 value
     uint16_t m_lastCOValue; // Last read CO value
     uint16_t m_lastH2SValue; // Last read H2S value
@@ -19,7 +19,7 @@ public:
     // Pure virtual function for getting millivolt values
     virtual void readAllValues() = 0;
 
-    virtual uint16_t getO2Value() const { return m_lastCH2OValue; }
+    virtual uint16_t getCH2OValue() const { return m_lastCH2OValue; }
     virtual uint16_t getCH4Value() const { return m_lastCH2OValue; }
     virtual uint16_t getCOValue() const { return m_lastCH2OValue; }
     virtual uint16_t getH2SValue() const { return m_lastCH2OValue; }

@@ -23,7 +23,7 @@ public:
         switch (gasIndex) {
             case 0: rawValue = m_analogSourceInput->getCOValue(); break;
             case 1: rawValue = m_analogSourceInput->getH2SValue(); break;
-            case 2: rawValue = m_analogSourceInput->getO2Value();  break; // Raw value is used directly
+            case 2: rawValue = m_analogSourceInput->getCH2OValue(); break; // Raw value is used directly
             case 3: rawValue = m_analogSourceInput->getCH4Value(); break;
             default: return 0.0;
         }
