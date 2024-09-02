@@ -20,9 +20,7 @@ public:
     virtual void readAllValues() = 0;
 
     virtual uint16_t getCH2OValue() const { return m_lastCH2OValue; }
-    virtual uint16_t getCH4Value() const { return m_lastCH2OValue; }
-    virtual uint16_t getCOValue() const { return m_lastCH2OValue; }
-    virtual uint16_t getH2SValue() const { return m_lastCH2OValue; }
+
 
     virtual ~AnalogSourceInput() = default;
 };

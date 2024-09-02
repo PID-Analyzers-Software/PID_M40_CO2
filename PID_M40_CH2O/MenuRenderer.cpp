@@ -93,7 +93,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
     lastBlinkTime = currentTime;
   }
 
-  bool highAlarmEnabled = true; // Boolean to enable or disable high alarm
+  bool highAlarmEnabled = false; // Boolean to enable or disable high alarm
   bool lowAlarmEnabled = false;  // Boolean to enable or disable low alarm
 
   m_display->clear();
@@ -118,17 +118,17 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
 
 
   // Get gas concentration values
-  int CH2O_value = m_dataSource->getCalibratedValue(2);
+  int CH2O_value = m_dataSource->getSelectedGasValue();
 
   // Alarm thresholds
-  const int CH2O_high_alarm_threshold = 1000;
+  const int CH2O_high_alarm_threshold = 3000;
   const int CH2O_low_alarm_threshold = 19;
 
   m_display->setFont(ArialMT_Plain_24);
 
   // Display gas concentration values with high and low alarm blinking
   m_display->setFont(ArialMT_Plain_10);
-  m_display->drawString(112, 33, "ug/m3");  // Unit
+  m_display->drawString(112, 33, "ppm");  // Unit
 
   m_display->drawString(14, 28, "CH2O");  // Gas name
 
@@ -143,10 +143,12 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
     }
   } else {
     m_display->setFont(ArialMT_Plain_24);
-    m_display->drawString(64, 18, String(CH2O_value));
+    m_display->drawString(64, 18, String(m_dataSource->getCalibratedValue()));
   }
 
-
+  m_display->setFont(ArialMT_Plain_10);
+  m_display->drawString(64, 51, String(CH2O_value));
+  m_display->drawString(100, 51, "ug/m3");
   m_display->display();
   delay(100); // Adjust this delay based on your application's requirements
 }
@@ -537,8 +539,10 @@ SSD1306ZEROMenuRenderer::SSD1306ZEROMenuRenderer(SSD1306Wire* display, DataSourc
 }
 void SSD1306ZEROMenuRenderer::render(Menu* menu)
 {
+  m_dataSource->readAllValues();
+
   const float multiplier = 0.125F; //GAIN 1
-  double sensor_val = m_dataSource->getCalibratedValue(1);
+  double sensor_val = m_dataSource->getSelectedGasValue();
   m_display->setFont(ArialMT_Plain_10);
 
   m_display->clear();
@@ -547,7 +551,8 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Zero");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 21, "“Place ZeroGas on Probe");
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
+  int CH2Ovalue = m_dataSource->getSelectedGasValue();
+  m_display->drawString(64, 34, String("Det: " + String(CH2Ovalue) + "ug/m3").c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
@@ -562,13 +567,15 @@ SSD1306CalGasMenuRenderer::SSD1306CalGasMenuRenderer(SSD1306Wire* display, DataS
 }
 void SSD1306CalGasMenuRenderer::render(Menu* menu)
 { m_display->clear();
+  m_dataSource->readAllValues();
+
   int calvalue = m_calvalue->getSelectedCalvalue();
   m_display->setColor(WHITE);
   m_display->setTextAlignment(TEXT_ALIGN_CENTER);
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getCalibratedValue(1)) + "mV").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getSelectedGasValue()) + "ug/m3").c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();

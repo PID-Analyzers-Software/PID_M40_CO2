@@ -8,7 +8,7 @@
 
 class Calvalue
 {
-    std::array<int,6> m_calvalueArray{{5000,6000,7000,8000,9000,10000}};
+    std::array<int,6> m_calvalueArray{{2,10,20,30,40,50}};
 
     int m_selectedCalvalue = 0;
 

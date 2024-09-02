@@ -38,7 +38,7 @@ class GasManager : public ParamChangeListener
 {
     std::vector<Gas> m_gases;
 
-    int m_selectedGas =EEPROM.readInt(4);
+    int m_selectedGas =0;
 
     double m_intercept;
     double m_slope;
@@ -97,15 +97,7 @@ public:
 
     double calculateSLM(double voltage) {
         double val = 0;
-        if(m_selectedGas==0){
-            val = ((voltage - m_intercept ) / m_slope) * 1000 ; //votlage in volts
-        }else if(m_selectedGas==1){
-            val = ((voltage - m_intercept2 ) / m_slope2) * 1000 ; //votlage in volts
-        }else if(m_selectedGas==2){
-            val = ((voltage - m_intercept3 ) / m_slope3) * 1000 ; //votlage in volts
-        }else if(m_selectedGas==3){
-            val = ((voltage - m_intercept4 ) / m_slope4) * 1000 ; //votlage in volts
-        }
+        val = ((voltage - m_intercept ) / m_slope)  ; //votlage in volts
         return val < 0 ? 0 : val;
     }
 
@@ -124,7 +116,7 @@ public:
         Serial.println("selectGasByIndex");
         if(index >= 0 && index < m_gases.size())
         {
-            m_selectedGas = index;
+            m_selectedGas = 0;
             //m_configurationManager->saveGasSelectedToEEPROM(index);
             Serial.println("gas index saved"+index);
             EEPROM.writeInt(4, index);
@@ -133,33 +125,14 @@ public:
     }
 
     void calibrate(double zero){
-        m_zero = zero/1000;
+        m_zero = zero;
         delay(20);
-        if(m_selectedGas==0) {
             m_intercept = m_zero;
             Serial.println("calibrating for gas 1");
             EEPROM.put(8+m_selectedGas*16, m_intercept);
             EEPROM.commit();
             Serial.print("Factors Saved to EEPROM: "); Serial.println(m_intercept);
-        }else if(m_selectedGas ==1){
-            m_intercept2 = m_zero;
-            Serial.println("calibrating for gas 2");
-            EEPROM.put(8+m_selectedGas*16, m_intercept2);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_intercept2);
-        }else if(m_selectedGas ==2){
-            m_intercept3 = m_zero;
-            Serial.println("calibrating for gas 3");
-            EEPROM.put(8+m_selectedGas*16, m_intercept3);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_intercept3);
-        }else if(m_selectedGas ==3){
-            m_intercept4 = m_zero;
-            Serial.println("calibrating for gas 4");
-            EEPROM.put(8+m_selectedGas*16, m_intercept4);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_intercept4);
-        }
+
 
         EEPROM.commit();
 
@@ -167,38 +140,23 @@ public:
     }
 
     void calibrate2(double cal){
-        m_calgas = cal / 1000;
+        m_calgas = cal ;
         int calvalue=Calvalue().getSelectedCalvalue();
-        double calgasv = calvalue/1000.0;
+        double calgasv = calvalue;
+        Serial.println("Here is the cal value:  ");
         Serial.println(calvalue);
+        Serial.println("Here is the cal gas value:  ");
         Serial.println(calgasv);
+        Serial.println("Here is the zero gas value:  ");
+        Serial.println(m_zero);
         m_slope = (m_calgas - m_zero) / calgasv;
-        if(m_selectedGas==0) {
-            m_slope = (m_calgas - m_zero) / calgasv;
+
             Serial.println("calibrating for gas 1");
             Serial.println(m_slope);
             EEPROM.put(16+m_selectedGas*16, m_slope);
             EEPROM.commit();
             Serial.print("Factors Saved to EEPROM: "); Serial.println(m_slope);
-        }else if(m_selectedGas ==1){
-            m_slope2 = (m_calgas - m_zero) / calgasv;
-            Serial.println("calibrating for gas 2");
-            EEPROM.put(16+m_selectedGas*16, m_slope2);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_slope2);
-        }else if(m_selectedGas ==2){
-            m_slope3 = (m_calgas - m_zero) / calgasv;
-            Serial.println("calibrating for gas 3");
-            EEPROM.put(16+m_selectedGas*16, m_slope3);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_slope3);
-        }else if(m_selectedGas ==3){
-            m_slope4 = (m_calgas - m_zero) / calgasv;
-            Serial.println("calibrating for gas 4");
-            EEPROM.put(16+m_selectedGas*16, m_slope4);
-            EEPROM.commit();
-            Serial.print("Factors Saved to EEPROM: "); Serial.println(m_slope4);
-        }
+
 
     }
 
@@ -223,7 +181,7 @@ public:
     }
 
     double getInterceptByIndex(int index) const {
-        switch (index) {
+        switch (0) {
             case 0: return m_intercept;
             case 1: return m_intercept2;
             case 2: return m_intercept3;
@@ -233,7 +191,7 @@ public:
     }
 
     double getSlopeByIndex(int index) const {
-        switch (index) {
+        switch (0) {
             case 0: return m_slope;
             case 1: return m_slope2;
             case 2: return m_slope3;

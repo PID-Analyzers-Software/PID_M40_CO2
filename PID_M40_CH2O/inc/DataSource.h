@@ -18,21 +18,15 @@ public:
     }
 
     // Calculates calibrated gas value based on the current gas configuration
-    double getCalibratedValue(int gasIndex) const {
+    double getCalibratedValue() const {
         double rawValue = 0.0;
-        switch (gasIndex) {
-            case 0: rawValue = m_analogSourceInput->getCOValue(); break;
-            case 1: rawValue = m_analogSourceInput->getH2SValue(); break;
-            case 2: rawValue = m_analogSourceInput->getCH2OValue(); break; // Raw value is used directly
-            case 3: rawValue = m_analogSourceInput->getCH4Value(); break;
-            default: return 0.0;
-        }
+        double CH2OValue = m_analogSourceInput->getCH2OValue();
+        rawValue = m_gasManager->calculateSLM(CH2OValue);
         return rawValue; // Now returns the scaled value directly
     }
 
     // Retrieves the gas value based on the currently selected gas in GasManager
     double getSelectedGasValue() const {
-        int selectedGasIndex = m_gasManager->getSelectedGasIndex();  // Ensure this method is defined in GasManager
-        return getCalibratedValue(selectedGasIndex);
+        return m_analogSourceInput->getCH2OValue();
     }
 };
