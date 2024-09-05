@@ -340,11 +340,11 @@ void setup() {
 
   vector<Menu*> calvalueMenus;
   calvalueMenus.push_back(new CalvalueMenuItem(String(2) + " ppm", "Cal Gas", 0, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(10) + " ppm", "Cal Gas", 1, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(20) + " ppm", "Cal Gas", 2, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(30) + " ppm", "Cal Gas", 3, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(40) + " ppm", "Cal Gas", 4, &g_calvalue, calvalueMenuRenderer));
-  calvalueMenus.push_back(new CalvalueMenuItem(String(50) + " ppm", "Cal Gas", 5, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(5) + " ppm", "Cal Gas", 1, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(10) + " ppm", "Cal Gas", 2, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(20) + " ppm", "Cal Gas", 3, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(30) + " ppm", "Cal Gas", 4, &g_calvalue, calvalueMenuRenderer));
+  calvalueMenus.push_back(new CalvalueMenuItem(String(40) + " ppm", "Cal Gas", 5, &g_calvalue, calvalueMenuRenderer));
 
   CompositeMenu* calvalueMenu = new CompositeMenu("Calvalue", "Main Menu" , calvalueMenus);
 

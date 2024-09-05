@@ -148,7 +148,7 @@ void SSD1306RunMenuRenderer::render(Menu* menu) {
 
   m_display->setFont(ArialMT_Plain_10);
   m_display->drawString(64, 51, String(CH2O_value));
-  m_display->drawString(100, 51, "ug/m3");
+  //m_display->drawString(100, 51, "ug/m3");
   m_display->display();
   delay(100); // Adjust this delay based on your application's requirements
 }
@@ -552,7 +552,7 @@ void SSD1306ZEROMenuRenderer::render(Menu* menu)
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 21, "“Place ZeroGas on Probe");
   int CH2Ovalue = m_dataSource->getSelectedGasValue();
-  m_display->drawString(64, 34, String("Det: " + String(CH2Ovalue) + "ug/m3").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(CH2Ovalue)).c_str());
 
   m_display->drawString(64, 45, "Press S when Stable");
   m_display->display();
@@ -575,7 +575,7 @@ void SSD1306CalGasMenuRenderer::render(Menu* menu)
   m_display->drawString(64, 0, "Calibration - Cal Gas");
   m_display->drawLine(0, 16, 256, 16);
   m_display->drawString(64, 22, String("Cal gas: " + String(calvalue) + " ppm").c_str());
-  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getSelectedGasValue()) + "ug/m3").c_str());
+  m_display->drawString(64, 34, String("Det: " + String(m_dataSource->getSelectedGasValue())).c_str());
   m_display->drawString(64, 45, "Press S when Stable");
 
   m_display->display();
