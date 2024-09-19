@@ -381,15 +381,18 @@ void setup() {
   g_configurationManager.addParamChangeListener((ParamChangeListener*)g_dataLogger.getMqttRealTimePublisher());
 
   g_configurationManager.init();
+  Serial.println("g_configManager.init finished.");
   g_configurationManager.loadFromEEPROM();
-
+  Serial.println("LoadFromEEPROM Finished.");
   g_timeSync.initTimeFromRTC();
+  Serial.println("initTimeFromRTC Finished.");
   int range = EEPROM.read(72);
   g_range.selectRangeByIndex(range);
   int alarm = EEPROM.read(76);
   g_alarm.selectAlarmByIndex(alarm);
   int lowalarm = EEPROM.read(92);
   g_lowalarm.selectLowalarmByIndex(lowalarm);
+  Serial.println("Setup() finished.");
 }
 
 void setupButtons()
